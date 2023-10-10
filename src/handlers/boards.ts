@@ -36,30 +36,46 @@ import prisma  from "../db"
     }
 
     export const getBoards = async (req, res) => {
-      const boards = await prisma.user.findMany({
-        where: {
-            id: req.user.id
-        },
-        include: {
-            boards: {
-                include: {
-                    columns: {
-                        include: {
-                            tasks: {
-                                include: {
-                                    subtasks: true,
-                                },
-                            },
-                        },
-                    },
-                },
-            },
-        },
-    });
-
-    // Sending the fetched boards data as a JSON response
-    res.json({data: boards})
-  }
+      try {
+          const boards = await prisma.user.findMany({
+              where: {
+                  id: req.user.id
+              },
+              select: {
+                  // Include or exclude the fields you need
+                  id: true,
+                  name: true,
+                  email: true,
+                  boards: {
+                      select: {
+                          id: true,
+                          name: true,
+                          columns: {
+                              select: {
+                                  id: true,
+                                  name: true,
+                                  tasks: {
+                                      select: {
+                                          id: true,
+                                          title: true,
+                                          subtasks: true
+                                      }
+                                  }
+                              }
+                          }
+                      }
+                  }
+              }
+          });
+  
+          res.json({data: boards});
+      } catch (error) {
+          // Handle the error accordingly
+          console.error(error);
+          res.status(500).json({error: 'An error occurred while fetching the boards'});
+      }
+  };
+  
 export const createboard = async (req, res) => {
 try {
       // Assuming user and product IDs are provided in the request body
