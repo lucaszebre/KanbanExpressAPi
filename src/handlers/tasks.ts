@@ -60,4 +60,36 @@ export const updateTaskSubtask= async (req, res) => {
   }
  
 }
+export const deleteTask= async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Find the task
+    const Deletedtask = await prisma.task.delete({
+      where: { id },
+      include: { subtasks: true },
+    });
+
+    res.json(Deletedtask);
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
+ 
+}
+export const getTask= async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Find the task
+    const task = await prisma.task.findUnique({
+      where: { id },
+      include: { subtasks: true },
+    });
+
+    res.json(task);
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
+ 
+}
 
