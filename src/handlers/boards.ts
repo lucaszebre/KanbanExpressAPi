@@ -36,25 +36,30 @@ import prisma  from "../db"
     }
 
     export const getBoards = async (req, res) => {
-    const boards = await prisma.board.findMany({
+      const boards = await prisma.user.findMany({
         where: {
-        userId: req.user.id},
-        include: {
-          columns: {
-            include: {
-              tasks: {
-                include: {
-                  subtasks: true,
-                },
-              },
-            },
-          },
+            id: req.user.id
         },
-      });
+        include: {
+            boards: {
+                include: {
+                    columns: {
+                        include: {
+                            tasks: {
+                                include: {
+                                    subtasks: true,
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    });
 
-
+    // Sending the fetched boards data as a JSON response
     res.json({data: boards})
-    }
+  }
 export const createboard = async (req, res) => {
 try {
       // Assuming user and product IDs are provided in the request body
