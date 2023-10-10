@@ -68,7 +68,7 @@ import prisma  from "../db"
               }
           });
   
-          res.json({data: boards});
+          res.json( boards);
       } catch (error) {
           // Handle the error accordingly
           console.error(error);
