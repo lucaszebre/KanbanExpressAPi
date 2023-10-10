@@ -8,17 +8,19 @@ export const comparePasswords = (password, hash) => {
 export const hashPassword = (password) => {
   return bcrypt.hash(password, 5)
 }
-
 export const createJWT = (user) => {
-  const token = jwt.sign({
+  const token = jwt.sign(
+    {
       id: user.id,
-      name:user.name,
-      email:user.email
-    }, 
-    process.env.JWT_SECRET
+      name: user.name,
+      email: user.email
+    },
+    process.env.JWT_SECRET,
+    { expiresIn: '1h' }
   )
-  return token
+  return token;
 }
+
 
 export const protect = (req, res, next) => {
   const bearer = req.headers.authorization
