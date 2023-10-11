@@ -32,6 +32,6 @@ router.get('/tasks/:id', getTask);
 router.put('/tasks/:id/column/:columnId',moveTaskToColumn);
 
 // Subtasks
-router.put('/subtask/:subtaskId', updateSubTask);
+router.put('/subtask/:id', updateSubTask);
 
 export default router;
