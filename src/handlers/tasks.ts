@@ -1,11 +1,10 @@
 import prisma  from "../db"
 
-export const updateTaskSubtask= async (req, res) => {
+export const updateTaskSubtask = async (req, res) => {
   const { id } = req.params;
   const { updatedTask, subtasksAdd, subtasksChangeName, subtasksToDelete } = req.body;
 
   try {
-    // Find the task
     const task = await prisma.task.findUnique({
       where: { id },
       include: { subtasks: true },
@@ -15,7 +14,6 @@ export const updateTaskSubtask= async (req, res) => {
       return res.status(404).json({ error: 'Task not found' });
     }
 
-    // Delete specified subtasks
     if (subtasksToDelete && subtasksToDelete.length > 0) {
       await prisma.subtask.deleteMany({
         where: {
@@ -24,7 +22,6 @@ export const updateTaskSubtask= async (req, res) => {
       });
     }
 
-    // Update existing subtasks' name
     if (subtasksChangeName && subtasksChangeName.length > 0) {
       const updateSubtasksPromises = subtasksChangeName.map((subtask) =>
         prisma.subtask.update({
@@ -35,7 +32,6 @@ export const updateTaskSubtask= async (req, res) => {
       await Promise.all(updateSubtasksPromises);
     }
 
-    // Add new subtasks
     if (subtasksAdd && subtasksAdd.length > 0) {
       const addSubtasksPromises = subtasksAdd.map((title) =>
         prisma.subtask.create({
@@ -48,7 +44,6 @@ export const updateTaskSubtask= async (req, res) => {
       await Promise.all(addSubtasksPromises);
     }
 
-    // Update the task
     const updatedTaskResult = await prisma.task.update({
       where: { id },
       data: updatedTask,
@@ -58,8 +53,8 @@ export const updateTaskSubtask= async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: 'Server error' });
   }
- 
-}
+};
+
 export const deleteTask= async (req, res) => {
   const { id } = req.params;
 
