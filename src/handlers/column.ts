@@ -28,21 +28,35 @@ export const createColumns = async (req, res) => {
 
 export const addTaskColumn = async (req, res) => {
   const { id } = req.params;
-  const newTask = req.body;
+  const { subtasks, ...newTask } = req.body;
+
   try {
+    // Check if column exists
+    const column = await prisma.column.findUnique({ where: { id }});
+    if (!column) {
+      return res.status(404).send('Column not found');
+    }
+
+    // If column exists, create task along with subtasks
     const createdTask = await prisma.task.create({
       data: {
         ...newTask,
         column: {
           connect: { id },
         },
+        subtasks: {
+          create: subtasks.map(title => ({ title })),
+        },
       },
     });
     res.status(201).json(createdTask);
-    } catch (error) {
-      res.status(500).send(error.message);
-    }
+  } catch (error) {
+    console.error(error); // Log the error for debugging
+    res.status(500).send(error.message);
   }
+};
+
+
 
 
 
