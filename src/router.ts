@@ -1,7 +1,7 @@
 import {Router} from 'express'
 import { body, oneOf, validationResult } from "express-validator"
 import { createColumns,updateColumn,deleteColumn,getColumn ,addTaskColumn} from './handlers/column'
-import { updateTaskSubtask ,getTask,deleteTask} from './handlers/tasks'
+import { updateTaskSubtask ,getTask,deleteTask,moveTaskToColumn} from './handlers/tasks'
 import { getBoards,getOneBoard,createboard,updateboard,deleteboard } from './handlers/boards'
 import { updateSubTask } from './handlers/subtask'
 import { handleInputErrors } from './modules/middleware'
@@ -29,6 +29,7 @@ router.post('/columns/:id/tasks', addTaskColumn);
 router.put('/tasks/:id', updateTaskSubtask);
 router.delete('/tasks/:id', deleteTask);
 router.get('/tasks/:id', getTask);
+router.put('/tasks/:id/column/:columnId',moveTaskToColumn);
 
 // Subtasks
 router.put('/subtask/:subtaskId', updateSubTask);

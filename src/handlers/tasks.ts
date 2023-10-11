@@ -93,3 +93,41 @@ export const getTask= async (req, res) => {
  
 }
 
+export const moveTaskToColumn = async (req, res) => {
+  const { id, columnId } = req.params;
+
+  try {
+    // Check if task and new column exist
+    const [existingTask, newColumn] = await Promise.all([
+      prisma.task.findUnique({ where: { id: id} }),
+      prisma.column.findUnique({ where: { id: columnId } }),
+    ]);
+
+    if (!existingTask) {
+      return res.status(404).send('Task not found');
+    }
+
+    if (!newColumn) {
+      return res.status(404).send('Column not found');
+    }
+
+    // If task and column exist, update the task's columnId
+    const updatedTask = await prisma.task.update({
+      where: { id: id },
+      data: {
+        column: {
+          connect: { id: columnId },
+        },
+      },
+      include: {
+        subtasks: true, // Include related subtasks in the response
+      },
+    });
+
+    res.status(200).json(updatedTask);
+  } catch (error) {
+    console.error(error); // Log the error for debugging
+    res.status(500).send(error.message);
+  }
+};
+
