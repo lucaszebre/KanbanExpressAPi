@@ -58,7 +58,9 @@ import prisma  from "../db"
                                       select: {
                                           id: true,
                                           title: true,
-                                          subtasks: true
+                                          subtasks: true,
+                                          description:true,
+
                                       }
                                   }
                               }
