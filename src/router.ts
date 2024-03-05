@@ -5,6 +5,7 @@ import { updateTaskSubtask ,getTask,deleteTask,moveTaskToColumn} from './handler
 import { getBoards,getOneBoard,createboard,updateboard,deleteboard } from './handlers/boards'
 import { updateSubTask } from './handlers/subtask'
 import { handleInputErrors } from './modules/middleware'
+import { protect } from './modules/auth'
 
 
 const router = Router()

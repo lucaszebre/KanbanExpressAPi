@@ -16,21 +16,14 @@ app.use(express.urlencoded({extended: true}))
 app.post('/register', createNewUser)
 app.post('/login', signin)
 
-
-
 app.use( protect, router)
+
+
 
 app.use((err, req, res, next) => {
   console.log(err)
   res.json({message: `had an error: ${err.message}`})
 })
-// console.log(process.env);
 
-// export function authSession(req: Request, res: Response, next: NextFunction) {
-//   res.locals.session = await getSession(req)
-//   next()
-// }
-
-// app.use(authSession)
 
 export default app
