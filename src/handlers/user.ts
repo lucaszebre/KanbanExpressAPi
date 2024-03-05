@@ -22,6 +22,8 @@ export const createNewUser = async (req, res) => {
         name:req.body.name,
       }
     })
+
+   
   
     const token = createJWT(user)
     res.json({ token })
@@ -39,13 +41,17 @@ export const signin = async (req, res) => {
         email: req.body.email
       }
     })
+
+    if(!user){
+      res.status(401).json({message:"No user"})
+    }
+
+     const isValid = await comparePasswords(req.body.password, user.password)
   
-    const isValid = await comparePasswords(req.body.password, user.password)
-  
-    if (!isValid) {
-      res.status(401)
-      res.json({message: ''})
-      return
+     if (!isValid) {
+       res.status(401)
+       res.json({message: ''})
+       return
     }
   
     const token = createJWT(user)

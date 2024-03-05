@@ -9,6 +9,7 @@ export const hashPassword = (password) => {
   return bcrypt.hash(password, 5)
 }
 export const createJWT = (user) => {
+  console.log(user)
   const token = jwt.sign(
     {
       id: user.id,
