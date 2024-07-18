@@ -11,8 +11,7 @@ export const createNewUser = async (req, res) => {
     });
 
     if (existingUser) {
-      res.status(400).json({ error: 'Email already in use' });
-      return;
+      return res.status(400).json({ error: 'Email already in use' });
     }
 
     const user = await prisma.user.create({
@@ -25,11 +24,12 @@ export const createNewUser = async (req, res) => {
 
    
   
-    const token = createJWT(user)
-    res.json({ token })
-    // ... rest of your code
+    const token = await createJWT(user)
+   return  res.status(200).json({ token })
   } catch (error) {
-    res.status(500).json({ error: 'Server error' });
+    console.log(error)
+
+    return res.status(500).json({ error });
   }
  
 }
@@ -43,21 +43,19 @@ export const signin = async (req, res) => {
     })
 
     if(!user){
-      res.status(401).json({message:"No user"})
+      return res.status(401).json({message:"No user"})
     }
 
      const isValid = await comparePasswords(req.body.password, user.password)
     
      if (!isValid) {
-       res.status(401)
-       res.json({message: ''})
-       return
+       return res.status(401).json({message: ''})
     }
   
     const token = createJWT(user)
-    res.json({ token })
+    return res.json({ token })
   } catch (error) {
-    res.status(500).json({ error: 'Server error' });
+    return res.status(500).json({ error: 'Server error' });
   }
   
 }
