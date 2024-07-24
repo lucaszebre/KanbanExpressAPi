@@ -5,7 +5,8 @@ import { updateTaskSubtask ,getTask,deleteTask,moveTaskToColumn} from './handler
 import { getBoards,getOneBoard,createboard,updateboard,deleteboard } from './handlers/boards'
 import { updateSubTask } from './handlers/subtask'
 import { handleInputErrors } from './modules/middleware'
-import { protect } from './modules/auth'
+import { createJWT, protect } from './modules/auth'
+import jwt from 'jsonwebtoken'
 
 
 const router = Router()
@@ -35,4 +36,16 @@ router.put('/tasks/:id/column/:columnId',moveTaskToColumn);
 // Subtasks
 router.put('/subtask/:id', updateSubTask);
 
+
+router.put('/verify', (req, res) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+  
+    if (token == null) return res.sendStatus(401);
+  
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+      if (err) return res.sendStatus(403);
+      return res.status(200).json({ valid: true, user });
+    });
+  });
 export default router;
