@@ -59,6 +59,6 @@ app.get("/", async (_req: Request, res: Response) => {
   })
 })
 
-// Error handlers
-app.use(errorNotFoundHandler)
-app.use(errorHandler)
+// // Error handlers
+// app.use(errorNotFoundHandler)
+// app.use(errorHandler)
