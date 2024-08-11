@@ -53,6 +53,7 @@ app.use('/api', authenticatedUser, router)
 
 
 app.get("/", async (_req: Request, res: Response) => {
+  res.json('ahaha welcome to kanban api not working')
 })
 
 // // Error handlers
