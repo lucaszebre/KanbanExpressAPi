@@ -1,6 +1,20 @@
-import prisma from "../db";
+import prisma from "../db.js";
+import {  Request, Response } from "express"
 
-export const createColumns = async (req, res) => {
+interface CreateColumnRequest extends Request {
+  body: { name: string };
+  params: { boardId: string };
+}
+
+interface GetColumnRequest extends Request {
+  params: { id: string };
+}
+
+interface UpdateColumnRequest extends Request {
+  params: { id: string };
+}
+
+export const createColumns = async (req:CreateColumnRequest, res:Response) => {
   try {
     // Validate that necessary data is provided
     const { name } = req.body;
@@ -18,7 +32,7 @@ export const createColumns = async (req, res) => {
 
     // Respond with the created column
     res.status(201).json(newColumn);
-  } catch (error) {
+  } catch (error:any) {
     // Handle error
     console.error('Error creating column: ', error);
     res.status(500).send(error.message);
@@ -26,7 +40,7 @@ export const createColumns = async (req, res) => {
 };
 
 
-export const addTaskColumn = async (req, res) => {
+export const addTaskColumn = async (req:Request, res:Response) => {
   const { id } = req.params;
   const { subtasks, ...newTask } = req.body;
 
@@ -45,12 +59,12 @@ export const addTaskColumn = async (req, res) => {
           connect: { id },
         },
         subtasks: {
-          create: subtasks.map(title => ({ title })),
+          create: subtasks.map((title: string) => ({ title })),
         },
       },
     });
     res.status(201).json(createdTask);
-  } catch (error) {
+  } catch (error:any) {
     console.error(error); // Log the error for debugging
     res.status(500).send(error.message);
   }
@@ -62,7 +76,7 @@ export const addTaskColumn = async (req, res) => {
 
 
 
-  export const getColumn = async (req, res) => {
+  export const getColumn = async (req:GetColumnRequest, res:Response) => {
     const { id } = req.params;
     try {
       const column = await prisma.column.findUnique({
@@ -79,12 +93,12 @@ export const addTaskColumn = async (req, res) => {
           return  res.status(401).send('Column not found')
       }
       res.json(column);
-    } catch (error) {
+    } catch (error:any) {
       res.status(500).send(error.message);
     }
   };
   
-  export const updateColumn = async (req, res) => {
+  export const updateColumn = async (req:Request, res:Response) => {
     const { id } = req.params;
     try {
       const updatedColumn = await prisma.column.update({
@@ -92,19 +106,19 @@ export const addTaskColumn = async (req, res) => {
         data: req.body,
       });
       res.json(updatedColumn);
-    } catch (error) {
+    } catch (error:any) {
       res.status(500).send(error.message);
     }
   };
   
-  export const deleteColumn = async (req, res) => {
+  export const deleteColumn = async (req:UpdateColumnRequest, res:Response) => {
     const { id } = req.params;
     try {
       const deletedColumn = await prisma.column.delete({
         where: { id },
       });
       res.json(deletedColumn);
-    } catch (error) {
+    } catch (error:any) {
       res.status(500).send(error.message);
     }
   };

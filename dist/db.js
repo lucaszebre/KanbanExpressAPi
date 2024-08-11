@@ -1,6 +1,4 @@
-"use strict";
-exports.__esModule = true;
-var client_1 = require("@prisma/client");
-var prisma = new client_1.PrismaClient();
-exports["default"] = prisma;
+import { PrismaClient } from '@prisma/client';
+const prisma = new PrismaClient();
+export default prisma;
 //# sourceMappingURL=db.js.map

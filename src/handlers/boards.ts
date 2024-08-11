@@ -1,6 +1,8 @@
-import prisma  from "../db"
+import prisma  from "../db.js"
+import  {  Request, Response } from "express"
 
-    export const getOneBoard= async (req, res) => {
+
+    export const getOneBoard= async (req:Request, res:Response) => {
         try {
 
             if(req.params.boardId){
@@ -35,11 +37,20 @@ import prisma  from "../db"
    
     }
 
-    export const getBoards = async (req, res) => {
+    export const getBoards = async (req:Request, res:Response) => {
       try {
+        if(!res.locals.session ){
+          res.status(500).json({error: 'Not auth'});
+
+        }  
+        
+        if(!res.locals.session?.user?.id ){
+          res.status(500).json({error: 'Not id '});
+
+        }
           const boards = await prisma.user.findMany({
               where: {
-                  id: res.locals.session.id
+                  id: res.locals.session?.user?.id
               },
               select: {
                   // Include or exclude the fields you need
@@ -78,20 +89,28 @@ import prisma  from "../db"
       }
   };
   
-export const createboard = async (req, res) => {
+export const createboard = async (req:Request, res:Response) => {
 try {
       // Assuming user and product IDs are provided in the request body
       const { name, columns } = req.body;
      
+      if(!res.locals.session ){
+        res.status(500).json({error: 'Not auth'});
+
+      }  
       
+      if(!res.locals.session?.user?.id ){
+        res.status(500).json({error: 'Not id '});
+
+      }
         const newBoard = await prisma.board.create({
           data: {
             name: name,
             user: {
-              connect: { id: res.locals.session.id },
+              connect: { id: res.locals.session?.user?.id },
             },
             columns: {
-              create: columns.map((colName) => ({ name: colName })),
+              create: columns.map((colName:string) => ({ name: colName })),
             },
           },
           include: {
@@ -106,13 +125,23 @@ try {
         }
     };
 
-    export const updateboard = async (req, res) => {
+    export const updateboard = async (req:Request, res:Response) => {
+      if(!res.locals.session ){
+        res.status(500).json({error: 'Not auth'});
+
+      }  
+      
+      if(!res.locals.session?.user?.id ){
+        res.status(500).json({error: 'Not id '});
+
+      }
+
         try {
             if(req.params.id){
                 console.log(req.params.id)
                 const board = await prisma.board.findUnique({
                     where: {
-                    id: res.locals.session.id
+                    id: res.locals.session?.user?.id
                     }
                 })
                 if (!board) {
@@ -151,7 +180,7 @@ try {
     
     }
 
-    export const deleteboard = async (req, res) => {
+    export const deleteboard = async (req:Request, res:Response) => {
       try {
         const deleted = await prisma.board.delete({
           where: {

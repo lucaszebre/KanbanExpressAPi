@@ -1,9 +1,8 @@
 import {Router} from 'express'
-import { createColumns,updateColumn,deleteColumn,getColumn ,addTaskColumn} from './handlers/column'
-import { updateTaskSubtask ,getTask,deleteTask,moveTaskToColumn} from './handlers/tasks'
-import { getBoards,getOneBoard,createboard,updateboard,deleteboard } from './handlers/boards'
-import { updateSubTask } from './handlers/subtask'
-import { authenticatedUser } from './middleware/auth.middleware'
+import { createColumns,updateColumn,deleteColumn,getColumn ,addTaskColumn} from './handlers/column.js'
+import { updateTaskSubtask ,getTask,deleteTask,moveTaskToColumn} from './handlers/tasks.js'
+import { getBoards,getOneBoard,createboard,updateboard,deleteboard } from './handlers/boards.js'
+import { updateSubTask } from './handlers/subtask.js'
 
 
 const router = Router()

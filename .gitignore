@@ -1,3 +1,21 @@
 node_modules
 # Keep environment variables out of version control
 .env
+.vercel
+# Dependency directory
+node_modules
+
+# Editors
+.idea
+*.iml
+.vscode/settings.json
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Ignore built ts files
+dist/**/*
+
+# Ignore built css files
+/public/css/output.css

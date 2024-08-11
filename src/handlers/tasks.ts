@@ -1,6 +1,7 @@
-import prisma  from "../db"
+import prisma  from "../db.js"
+import  { NextFunction, Request, Response } from "express"
 
-export const updateTaskSubtask = async (req, res) => {
+export const updateTaskSubtask = async (req:Request, res:Response) => {
   const { id } = req.params;
   const { updatedTask, subtasksAdd, subtasksChangeName, subtasksToDelete } = req.body;
 
@@ -23,7 +24,7 @@ export const updateTaskSubtask = async (req, res) => {
     }
 
     if (subtasksChangeName && subtasksChangeName.length > 0) {
-      const updateSubtasksPromises = subtasksChangeName.map((subtask) =>
+      const updateSubtasksPromises = subtasksChangeName.map((subtask:{id:string,title:string}) =>
         prisma.subtask.update({
           where: { id: subtask.id },
           data: { title: subtask.title },
@@ -33,7 +34,7 @@ export const updateTaskSubtask = async (req, res) => {
     }
 
     if (subtasksAdd && subtasksAdd.length > 0) {
-      const addSubtasksPromises = subtasksAdd.map((title) =>
+      const addSubtasksPromises = subtasksAdd.map((title:string) =>
         prisma.subtask.create({
           data: {
             title,
@@ -55,7 +56,7 @@ export const updateTaskSubtask = async (req, res) => {
   }
 };
 
-export const deleteTask= async (req, res) => {
+export const deleteTask= async (req:Request, res:Response) => {
   const { id } = req.params;
 
   try {
@@ -71,7 +72,7 @@ export const deleteTask= async (req, res) => {
   }
  
 }
-export const getTask= async (req, res) => {
+export const getTask= async (req:Request, res:Response) => {
   const { id } = req.params;
 
   try {
@@ -88,7 +89,7 @@ export const getTask= async (req, res) => {
  
 }
 
-export const moveTaskToColumn = async (req, res) => {
+export const moveTaskToColumn = async (req:Request, res:Response) => {
   const { id, columnId } = req.params;
 
   try {
@@ -120,7 +121,7 @@ export const moveTaskToColumn = async (req, res) => {
     });
 
     res.status(200).json(updatedTask);
-  } catch (error) {
+  } catch (error:any) {
     console.error(error); // Log the error for debugging
     res.status(500).send(error.message);
   }

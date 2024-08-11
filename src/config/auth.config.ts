@@ -11,10 +11,6 @@ export const authConfig = {
     LinkedIn,
   ],
   secret:process.env.AUTH_SECRET,
-  callbacks:{
-    signin: async (profile, account, metadata) => { 
-      console.log(profile,"after the signin")
-    },
-
-  }
+  
+  
 }

@@ -6,14 +6,15 @@
     "type": "module",
     "private": true,
     "scripts": {
-        "start": "node dist/server.js",
+        "start": " pnpm exec prisma migrate deploy  &&  node dist/server.js",
         "clean": "rm -rf dist",
-        "build": "pnpm build:ts && pnpm build:css",
+        "build": "pnpm exec prisma migrate deploy && pnpm build:ts && pnpm build:css",
         "build:ts": "tsc",
         "build:css": "tailwindcss -i ./public/css/style.css -o ./public/css/output.css",
         "dev": "tsx watch --env-file=.env src/server.ts & pnpm build:css -w",
         "lint": "eslint src/*.ts --fix",
-        "prettier": "prettier src/*.ts --write"
+        "prettier": "prettier src/*.ts --write",
+        "postinstall": "prisma generate"
     },
     "author": "Lucas Zebre <lucaszebre1@gmail.com>",
     "license": "MIT",
