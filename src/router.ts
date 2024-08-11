@@ -3,10 +3,10 @@ import { createColumns,updateColumn,deleteColumn,getColumn ,addTaskColumn} from 
 import { updateTaskSubtask ,getTask,deleteTask,moveTaskToColumn} from './handlers/tasks'
 import { getBoards,getOneBoard,createboard,updateboard,deleteboard } from './handlers/boards'
 import { updateSubTask } from './handlers/subtask'
+import { authenticatedUser } from './middleware/auth.middleware'
 
 
 const router = Router()
-
 
 // Boards
 router.post('/boards', createboard);

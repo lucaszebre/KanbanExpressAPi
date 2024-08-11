@@ -9,7 +9,24 @@ html
       div(
         class="mb-2 flex items-center justify-between gap-2 rounded-b-md bg-gray-100 p-2 pl-4"
       )
-        
+        if session
+          div(class="flex flex-row items-center gap-2")
+            if session.user.image
+              img(src=`${session.user.image}`, class="h-8 w-8 rounded-full")
+            span
+              | Signed in as #{ ' ' }
+              strong= session.user.email || session.user.name
+          a(
+            class="rounded-md bg-blue-600 px-5 py-2.5 font-medium text-white",
+            href="/api/auth/signout"
+          ) Sign out
+        else
+          span(class="") You are not signed in
+          a#sign-indiv(
+            ,
+            class="rounded-md bg-blue-600 px-5 py-2.5 font-medium text-white",
+            href="/api/auth/signin"
+          ) Sign in
           
 
       nav(class="mb-4")

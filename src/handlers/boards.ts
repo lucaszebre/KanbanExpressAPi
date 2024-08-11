@@ -39,7 +39,7 @@ import prisma  from "../db"
       try {
           const boards = await prisma.user.findMany({
               where: {
-                  id: req.user.id
+                  id: res.locals.session.id
               },
               select: {
                   // Include or exclude the fields you need
@@ -88,7 +88,7 @@ try {
           data: {
             name: name,
             user: {
-              connect: { id: req.user.id },
+              connect: { id: res.locals.session.id },
             },
             columns: {
               create: columns.map((colName) => ({ name: colName })),
@@ -112,7 +112,7 @@ try {
                 console.log(req.params.id)
                 const board = await prisma.board.findUnique({
                     where: {
-                    id: req.params.id
+                    id: res.locals.session.id
                     }
                 })
                 if (!board) {

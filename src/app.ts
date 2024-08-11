@@ -14,7 +14,7 @@ import {
 import { ExpressAuth } from "@auth/express"
 import { authConfig } from "./config/auth.config.js"
 import * as pug from "pug"
-
+import router from "./router.js"
 export const app = express()
 
 app.set("port", process.env.PORT || 3000)
@@ -47,17 +47,10 @@ app.use(currentSession)
 app.use("/api/auth/*", ExpressAuth(authConfig))
 
 // Routes
-app.get("/protected", async (_req: Request, res: Response) => {
-  res.render("protected", { session: res.locals.session })
-})
 
-app.get(
-  "/api/protected",
-  authenticatedUser,
-  async (_req: Request, res: Response) => {
-    res.json(res.locals.session)
-  },
-)
+
+app.use('/api', authenticatedUser, router)
+
 
 app.get("/", async (_req: Request, res: Response) => {
   res.render("index", {

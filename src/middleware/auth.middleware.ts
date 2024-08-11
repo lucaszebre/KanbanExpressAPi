@@ -14,23 +14,24 @@ export async function authenticatedUser(
 
   res.locals.session = session
 
-  console.log(session,"session")
-
-  const existingUser = await prisma.user.findUnique({
-    where: {
-      email: session.user.email,
-    },
-  });
-
-  if (!existingUser) {
-    const user = await prisma.user.create({
-        data: {
-          email: session.user.email,
-          name:session.user.name,
-          profilePicture:session.user.image,
-        }
-      })
-  }
+    // if(res.locals.session){
+    //     const existingUser = await prisma.user.findUnique({
+    //         where: {
+    //           email: session.user.email,
+    //         },
+    //       });
+        
+    //       if (!existingUser) {
+    //         const user = await prisma.user.create({
+    //             data: {
+    //               email: session.user.email,
+    //               name:session.user.name,
+    //               profilePicture:session.user.image,
+    //             }
+    //           })
+    //       }
+    // }
+  
 
 
 
