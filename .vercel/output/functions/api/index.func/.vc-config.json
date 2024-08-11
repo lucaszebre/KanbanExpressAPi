@@ -1,0 +1,9 @@
+{
+  "handler": "api/index.js",
+  "runtime": "nodejs20.x",
+  "environment": {},
+  "launcherType": "Nodejs",
+  "shouldAddHelpers": true,
+  "shouldAddSourcemapSupport": true,
+  "awsLambdaHandler": ""
+}
