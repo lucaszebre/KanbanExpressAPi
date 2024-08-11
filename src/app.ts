@@ -20,9 +20,9 @@ export const app = express()
 app.set("port", process.env.PORT || 3000)
 
 // @ts-expect-error (https://stackoverflow.com/questions/45342307/error-cannot-find-module-pug)
-app.engine("pug", pug.__express)
-app.set("views", path.join(import.meta.dirname, "..", "views"))
-app.set("view engine", "pug")
+// app.engine("pug", pug.__express)
+// app.set("views", path.join(import.meta.dirname, "..", "views"))
+// app.set("view engine", "pug")
 
 // Trust Proxy for Proxies (Heroku, Render.com, Docker behind Nginx, etc)
 // https://stackoverflow.com/questions/40459511/in-express-js-req-protocol-is-not-picking-up-https-for-my-secure-link-it-alwa
@@ -53,10 +53,6 @@ app.use('/api', authenticatedUser, router)
 
 
 app.get("/", async (_req: Request, res: Response) => {
-  res.render("index", {
-    title: "KanbanApi by Lucas",
-    user: res.locals.session?.user,
-  })
 })
 
 // // Error handlers
