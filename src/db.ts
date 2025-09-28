@@ -1,5 +1,7 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from "../prisma/client";
 
-const prisma = new PrismaClient()
-
-export default prisma
+// const adapter = new PrismaBetterSQLite3({
+//   url: "file:../prisma/kanban.db",
+// });
+const prisma = new PrismaClient();
+export default prisma;

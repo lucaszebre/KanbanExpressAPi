@@ -7,13 +7,14 @@
         "dev": "nodemon src/index.ts",
         "migrate": "npx prisma migrate dev",
         "start": "npx prisma migrate deploy && npx ts-node src/index.ts",
-  "build": "tsc",
-  "postinstall": "npm run build"
+        "build": "tsc",
+        "postinstall": "npm run build"
     },
     "keywords": [],
     "author": "",
     "license": "ISC",
     "dependencies": {
+        "@prisma/adapter-better-sqlite3": "^6.16.2",
         "@prisma/client": "^4.16.2",
         "bcrypt": "^5.0.1",
         "cors": "^2.8.5",
