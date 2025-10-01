@@ -1,39 +1,40 @@
 {
-    "name": "course",
-    "version": "1.0.0",
-    "description": "",
-    "main": "./src/index.ts",
-    "scripts": {
-        "dev": "nodemon src/index.ts",
-        "migrate": "npx prisma migrate dev",
-        "start": "npx prisma migrate deploy && npx ts-node src/index.ts",
-        "build": "tsc",
-        "postinstall": "npm run build"
-    },
-    "keywords": [],
-    "author": "",
-    "license": "ISC",
-    "dependencies": {
-        "@prisma/adapter-better-sqlite3": "^6.16.2",
-        "@prisma/client": "^4.16.2",
-        "bcrypt": "^5.0.1",
-        "cors": "^2.8.5",
-        "dotenv": "^16.0.2",
-        "express": "^4.18.1",
-        "express-validator": "^6.14.2",
-        "jsonwebtoken": "^9.0.2",
-        "morgan": "^1.10.0",
-        "nodemon": "^3.0.1"
-    },
-    "devDependencies": {
-        "@types/bcrypt": "^5.0.2",
-        "@types/cors": "^2.8.17",
-        "@types/express": "^4.17.21",
-        "@types/jsonwebtoken": "^9.0.6",
-        "@types/morgan": "^1.9.9",
-        "@types/node": "^18.19.41",
-        "prisma": "^4.4.0",
-        "ts-node": "^10.9.2",
-        "typescript": "^4.9.5"
-    }
+  "name": "course",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./src/index.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "npx tsx --env-file=.env --watch  src/index.ts",
+    "migrate": "npx prisma migrate dev",
+    "start": "npx prisma migrate deploy && npx ts-node src/index.ts",
+    "build": "tsc",
+    "postinstall": "npm run build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/adapter-better-sqlite3": "^6.16.2",
+    "@prisma/client": "^4.16.2",
+    "bcrypt": "^5.0.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.2",
+    "express": "^4.18.1",
+    "express-validator": "^6.14.2",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "nodemon": "^3.0.1"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.23",
+    "@types/jsonwebtoken": "^9.0.6",
+    "@types/morgan": "^1.9.9",
+    "@types/node": "^18.19.128",
+    "prisma": "^4.4.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^4.9.5"
+  }
 }

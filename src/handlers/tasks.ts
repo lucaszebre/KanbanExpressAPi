@@ -1,8 +1,17 @@
-import prisma  from "../db"
+import { Request, Response } from "express";
+import prisma from "../db";
 
-export const updateTaskSubtask = async (req, res) => {
+type AuthenticatedRequest = Request & {
+  user?: { id: string; name: string; email: string };
+};
+
+export const updateTaskSubtask = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<Response> => {
   const { id } = req.params;
-  const { updatedTask, subtasksAdd, subtasksChangeName, subtasksToDelete } = req.body;
+  const { updatedTask, subtasksAdd, subtasksChangeName, subtasksToDelete } =
+    req.body;
 
   try {
     const task = await prisma.task.findUnique({
@@ -11,7 +20,7 @@ export const updateTaskSubtask = async (req, res) => {
     });
 
     if (!task) {
-      return res.status(404).json({ error: 'Task not found' });
+      return res.status(404).json({ error: "Task not found" });
     }
 
     if (subtasksToDelete && subtasksToDelete.length > 0) {
@@ -49,64 +58,67 @@ export const updateTaskSubtask = async (req, res) => {
       data: updatedTask,
     });
 
-    res.json(updatedTaskResult);
+    return res.json(updatedTaskResult);
   } catch (error) {
-    res.status(500).json({ error: 'Server error' });
+    return res.status(500).json({ error: "Server error" });
   }
 };
 
-export const deleteTask= async (req, res) => {
+export const deleteTask = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<Response> => {
   const { id } = req.params;
 
   try {
-    // Find the task
-    const Deletedtask = await prisma.task.delete({
+    const deletedTask = await prisma.task.delete({
       where: { id },
       include: { subtasks: true },
     });
 
-    res.json(Deletedtask);
+    return res.json(deletedTask);
   } catch (error) {
-    res.status(500).json({ error: 'Server error' });
+    return res.status(500).json({ error: "Server error" });
   }
- 
-}
-export const getTask= async (req, res) => {
+};
+export const getTask = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<Response> => {
   const { id } = req.params;
 
   try {
-    // Find the task
     const task = await prisma.task.findUnique({
       where: { id },
       include: { subtasks: true },
     });
 
-    res.json(task);
+    return res.json(task);
   } catch (error) {
-    res.status(500).json({ error: 'Server error' });
+    return res.status(500).json({ error: "Server error" });
   }
- 
-}
+};
 
-export const moveTaskToColumn = async (req, res) => {
+export const moveTaskToColumn = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<Response> => {
   const { id, columnId } = req.params;
 
   try {
-    // Check if task and new column exist
     const [existingTask, newColumn] = await Promise.all([
-      prisma.task.findUnique({ where: { id: id} }),
+      prisma.task.findUnique({ where: { id: id } }),
       prisma.column.findUnique({ where: { id: columnId } }),
     ]);
 
     if (!existingTask) {
-      return res.status(404).send('Task not found');
+      return res.status(404).json({ error: "Task not found" });
     }
 
     if (!newColumn) {
-      return res.status(404).send('Column not found');
+      return res.status(404).json({ error: "Column not found" });
     }
 
-    // If task and column exist, update the task's columnId
     const updatedTask = await prisma.task.update({
       where: { id: id },
       data: {
@@ -115,14 +127,13 @@ export const moveTaskToColumn = async (req, res) => {
         },
       },
       include: {
-        subtasks: true, // Include related subtasks in the response
+        subtasks: true,
       },
     });
 
-    res.status(200).json(updatedTask);
+    return res.status(200).json(updatedTask);
   } catch (error) {
-    console.error(error); // Log the error for debugging
-    res.status(500).send(error.message);
+    console.error(error);
+    return res.status(500).json({ error: error.message });
   }
 };
-

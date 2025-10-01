@@ -1,37 +1,34 @@
-import express from 'express'
-import morgan from 'morgan'
-import cors from 'cors'
-import { protect } from './modules/auth'
-import { createNewUser, signin } from './handlers/user'
-import router from './router'
+import cors from "cors";
+import express, { Application, NextFunction, Request, Response } from "express";
+import morgan from "morgan";
+import { createNewUser, signin } from "./handlers/user";
+import { protect } from "./modules/auth";
+import router from "./router";
 
-const app = express()
+const app: Application = express();
 
-// Middleware
-app.use(cors())
-app.use(morgan('dev'))
-app.use(express.json())
-app.use(express.urlencoded({extended: true}))
+app.use(
+  cors({
+    origin: process.env.TRUST_ORIGIN,
+    methods: ["GET", "PATCH", "POST", "DELETE", "HEAD"],
+  })
+);
+app.use(morgan("dev"));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Public routes
-app.post('/register', createNewUser)
-app.post('/login', signin)
+app.post("/register", createNewUser);
+app.post("/login", signin);
 
+app.use("/api", protect, router);
 
+app.use((err: Error, req: Request, res: Response, next: NextFunction): void => {
+  console.error(err.stack);
+  res.status(500).json({ message: `Internal server error: ${err.message}` });
+});
 
+app.use((req: Request, res: Response): void => {
+  res.status(404).json({ message: "Not Found" });
+});
 
-// Protected routes
-app.use('/api', protect, router)
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack)
-  res.status(500).json({message: `Internal server error: ${err.message}`})
-})
-
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({message: 'Not Found'})
-})
-
-export default app
+export default app;

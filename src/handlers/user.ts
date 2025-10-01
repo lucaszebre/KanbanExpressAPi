@@ -1,8 +1,16 @@
-import prisma from '../db'
-import { comparePasswords, createJWT, hashPassword } from '../modules/auth'
+import { Request, Response } from "express";
+import jwt from "jsonwebtoken";
+import prisma from "../db";
+import { comparePasswords, createJWT, hashPassword } from "../modules/auth";
 
+type AuthenticatedRequest = Request & {
+  user?: { id: string; name: string; email: string };
+};
 
-export const createNewUser = async (req, res) => {
+export const createNewUser = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<Response> => {
   try {
     const existingUser = await prisma.user.findUnique({
       where: {
@@ -11,56 +19,82 @@ export const createNewUser = async (req, res) => {
     });
 
     if (existingUser) {
-      return res.status(404).json({ error: 'Email already in use' });
+      return res.status(404).json({ error: "Email already in use" });
     }
 
     const user = await prisma.user.create({
       data: {
         email: req.body.email,
         password: await hashPassword(req.body.password),
-        name:req.body.name,
-      }
-    })
+        name: req.body.name,
+      },
+    });
 
-   
-  
-    const token = await createJWT(user)
-   return  res.status(200).json({ token })
+    const token = await createJWT(user);
+    return res.status(200).json({ token });
   } catch (error) {
-    console.log(error)
-
-    return res.status(500).json({ error });
+    console.error(error);
+    return res.status(500).json({ error: "Server error" });
   }
- 
-}
+};
 
-
-export const signin = async (req, res) => {
+export const signin = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<Response> => {
   try {
-    const { email, password } = req.body
+    const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required" })
+      return res
+        .status(400)
+        .json({ message: "Email and password are required" });
     }
 
     const user = await prisma.user.findUnique({
-      where: { email }
-    })
+      where: { email },
+    });
 
     if (!user) {
-      return res.status(401).json({ message: "Invalid credentials" })
+      return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    const isValid = await comparePasswords(password, user.password)
+    const isValid = await comparePasswords(password, user.password);
 
     if (!isValid) {
-      return res.status(401).json({ message: "Invalid credentials" })
+      return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    const token = createJWT(user)
-    return res.status(200).json({ token })
+    const token = createJWT(user);
+    return res.status(200).json({ token });
   } catch (error) {
-    console.error('Signin error:', error)
-    return res.status(500).json({ message: "Internal server error" })
+    console.error("Signin error:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
-}
+};
+
+export const getUserJwt = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<Response> => {
+  const bearer = req.headers.authorization;
+
+  if (!bearer) {
+    return res.status(401).json({ message: "not authorized" });
+  }
+
+  const [, token] = bearer.split(" ");
+
+  if (!token) {
+    return res.status(401).json({ message: "not valid token" });
+  }
+
+  try {
+    const user = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = user;
+    return res.status(200).json(user);
+  } catch (e) {
+    console.error(e);
+    return res.status(401).json({ message: "not valid token" });
+  }
+};

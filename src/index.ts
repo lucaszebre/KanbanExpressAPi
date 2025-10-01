@@ -1,7 +1,7 @@
-import * as dotenv from 'dotenv';
+import * as dotenv from "dotenv";
 dotenv.config();
 
-import app from './server';
+import app from "./server";
 
 const PORT = process.env.PORT || 3000; // Adding a fallback value in case the PORT variable is not set
 
