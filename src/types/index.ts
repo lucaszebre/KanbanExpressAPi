@@ -40,7 +40,7 @@ export const SubtaskSchema = z.object({
 export const CreateUserSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email format"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  password: z.string().min(4, "Password must be at least 6 characters"),
 });
 
 export const CreateBoardSchema = z.object({
@@ -64,6 +64,11 @@ export const CreateSubtaskSchema = z.object({
   title: z.string().min(1, "Subtask title is required"),
   isCompleted: z.boolean().optional().default(false),
   taskId: z.string().uuid("Invalid task ID format"),
+});
+
+export const CreateBoardWithColumnsSchema = z.object({
+  name: z.string().min(1, "Board name is required"),
+  columns: z.array(z.string().min(1, "Column name is required")).optional(),
 });
 
 // Update schemas (all fields optional except id)

@@ -121,12 +121,14 @@ exports.Prisma.BoardScalarFieldEnum = {
 
 exports.Prisma.ColumnScalarFieldEnum = {
   id: 'id',
+  index: 'index',
   name: 'name',
   boardId: 'boardId'
 };
 
 exports.Prisma.TaskScalarFieldEnum = {
   id: 'id',
+  index: 'index',
   title: 'title',
   description: 'description',
   status: 'status',
@@ -135,6 +137,7 @@ exports.Prisma.TaskScalarFieldEnum = {
 
 exports.Prisma.SubtaskScalarFieldEnum = {
   id: 'id',
+  index: 'index',
   title: 'title',
   isCompleted: 'isCompleted',
   taskId: 'taskId'

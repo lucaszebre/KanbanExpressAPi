@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import prisma from "../db";
+import { CreateBoardWithColumnsSchema } from "../types";
 
 type AuthenticatedRequest = Request & {
   user?: { id: string; name: string; email: string };
@@ -90,8 +91,13 @@ export const createboard = async (
   res: Response
 ): Promise<void> => {
   try {
+    const validation = CreateBoardWithColumnsSchema.safeParse(req.body);
+    if (!validation.success) {
+      res.status(400).json({ error: validation.error.issues });
+      return;
+    }
     // Assuming user and product IDs are provided in the request body
-    const { name, columns } = req.body;
+    const { name, columns } = validation.data;
 
     const newBoard = await prisma.board.create({
       data: {
@@ -99,18 +105,23 @@ export const createboard = async (
         user: {
           connect: { id: req.user.id },
         },
-        columns: {
-          create: columns.map((colName) => ({ name: colName })),
-        },
+        columns: columns
+          ? {
+              create: columns.map((column: string) => ({
+                name: column,
+              })),
+            }
+          : undefined,
       },
       include: {
         columns: true,
       },
     });
-    res.json({ newBoard });
+
+    res.status(201).json({ data: newBoard });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ error: "Failed to create board" });
   }
 };
 

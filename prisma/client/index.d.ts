@@ -59,6 +59,7 @@ export type ColumnPayload<ExtArgs extends $Extensions.Args = $Extensions.Default
   }
   scalars: $Extensions.GetResult<{
     id: string
+    index: number
     name: string
     boardId: string
   }, ExtArgs["result"]["column"]>
@@ -78,6 +79,7 @@ export type TaskPayload<ExtArgs extends $Extensions.Args = $Extensions.DefaultAr
   }
   scalars: $Extensions.GetResult<{
     id: string
+    index: number
     title: string
     description: string
     status: string
@@ -98,6 +100,7 @@ export type SubtaskPayload<ExtArgs extends $Extensions.Args = $Extensions.Defaul
   }
   scalars: $Extensions.GetResult<{
     id: string
+    index: number
     title: string
     isCompleted: boolean
     taskId: string
@@ -3325,44 +3328,68 @@ export namespace Prisma {
 
   export type AggregateColumn = {
     _count: ColumnCountAggregateOutputType | null
+    _avg: ColumnAvgAggregateOutputType | null
+    _sum: ColumnSumAggregateOutputType | null
     _min: ColumnMinAggregateOutputType | null
     _max: ColumnMaxAggregateOutputType | null
   }
 
+  export type ColumnAvgAggregateOutputType = {
+    index: number | null
+  }
+
+  export type ColumnSumAggregateOutputType = {
+    index: number | null
+  }
+
   export type ColumnMinAggregateOutputType = {
     id: string | null
+    index: number | null
     name: string | null
     boardId: string | null
   }
 
   export type ColumnMaxAggregateOutputType = {
     id: string | null
+    index: number | null
     name: string | null
     boardId: string | null
   }
 
   export type ColumnCountAggregateOutputType = {
     id: number
+    index: number
     name: number
     boardId: number
     _all: number
   }
 
 
+  export type ColumnAvgAggregateInputType = {
+    index?: true
+  }
+
+  export type ColumnSumAggregateInputType = {
+    index?: true
+  }
+
   export type ColumnMinAggregateInputType = {
     id?: true
+    index?: true
     name?: true
     boardId?: true
   }
 
   export type ColumnMaxAggregateInputType = {
     id?: true
+    index?: true
     name?: true
     boardId?: true
   }
 
   export type ColumnCountAggregateInputType = {
     id?: true
+    index?: true
     name?: true
     boardId?: true
     _all?: true
@@ -3406,6 +3433,18 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
+     * Select which fields to average
+    **/
+    _avg?: ColumnAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ColumnSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: ColumnMinAggregateInputType
@@ -3436,6 +3475,8 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: ColumnCountAggregateInputType | true
+    _avg?: ColumnAvgAggregateInputType
+    _sum?: ColumnSumAggregateInputType
     _min?: ColumnMinAggregateInputType
     _max?: ColumnMaxAggregateInputType
   }
@@ -3443,9 +3484,12 @@ export namespace Prisma {
 
   export type ColumnGroupByOutputType = {
     id: string
+    index: number
     name: string
     boardId: string
     _count: ColumnCountAggregateOutputType | null
+    _avg: ColumnAvgAggregateOutputType | null
+    _sum: ColumnSumAggregateOutputType | null
     _min: ColumnMinAggregateOutputType | null
     _max: ColumnMaxAggregateOutputType | null
   }
@@ -3466,6 +3510,7 @@ export namespace Prisma {
 
   export type ColumnSelect<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    index?: boolean
     name?: boolean
     boardId?: boolean
     board?: boolean | BoardArgs<ExtArgs>
@@ -3475,6 +3520,7 @@ export namespace Prisma {
 
   export type ColumnSelectScalar = {
     id?: boolean
+    index?: boolean
     name?: boolean
     boardId?: boolean
   }
@@ -4258,12 +4304,23 @@ export namespace Prisma {
 
   export type AggregateTask = {
     _count: TaskCountAggregateOutputType | null
+    _avg: TaskAvgAggregateOutputType | null
+    _sum: TaskSumAggregateOutputType | null
     _min: TaskMinAggregateOutputType | null
     _max: TaskMaxAggregateOutputType | null
   }
 
+  export type TaskAvgAggregateOutputType = {
+    index: number | null
+  }
+
+  export type TaskSumAggregateOutputType = {
+    index: number | null
+  }
+
   export type TaskMinAggregateOutputType = {
     id: string | null
+    index: number | null
     title: string | null
     description: string | null
     status: string | null
@@ -4272,6 +4329,7 @@ export namespace Prisma {
 
   export type TaskMaxAggregateOutputType = {
     id: string | null
+    index: number | null
     title: string | null
     description: string | null
     status: string | null
@@ -4280,6 +4338,7 @@ export namespace Prisma {
 
   export type TaskCountAggregateOutputType = {
     id: number
+    index: number
     title: number
     description: number
     status: number
@@ -4288,8 +4347,17 @@ export namespace Prisma {
   }
 
 
+  export type TaskAvgAggregateInputType = {
+    index?: true
+  }
+
+  export type TaskSumAggregateInputType = {
+    index?: true
+  }
+
   export type TaskMinAggregateInputType = {
     id?: true
+    index?: true
     title?: true
     description?: true
     status?: true
@@ -4298,6 +4366,7 @@ export namespace Prisma {
 
   export type TaskMaxAggregateInputType = {
     id?: true
+    index?: true
     title?: true
     description?: true
     status?: true
@@ -4306,6 +4375,7 @@ export namespace Prisma {
 
   export type TaskCountAggregateInputType = {
     id?: true
+    index?: true
     title?: true
     description?: true
     status?: true
@@ -4351,6 +4421,18 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
+     * Select which fields to average
+    **/
+    _avg?: TaskAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: TaskSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: TaskMinAggregateInputType
@@ -4381,6 +4463,8 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: TaskCountAggregateInputType | true
+    _avg?: TaskAvgAggregateInputType
+    _sum?: TaskSumAggregateInputType
     _min?: TaskMinAggregateInputType
     _max?: TaskMaxAggregateInputType
   }
@@ -4388,11 +4472,14 @@ export namespace Prisma {
 
   export type TaskGroupByOutputType = {
     id: string
+    index: number
     title: string
     description: string
     status: string
     columnId: string
     _count: TaskCountAggregateOutputType | null
+    _avg: TaskAvgAggregateOutputType | null
+    _sum: TaskSumAggregateOutputType | null
     _min: TaskMinAggregateOutputType | null
     _max: TaskMaxAggregateOutputType | null
   }
@@ -4413,6 +4500,7 @@ export namespace Prisma {
 
   export type TaskSelect<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    index?: boolean
     title?: boolean
     description?: boolean
     status?: boolean
@@ -4424,6 +4512,7 @@ export namespace Prisma {
 
   export type TaskSelectScalar = {
     id?: boolean
+    index?: boolean
     title?: boolean
     description?: boolean
     status?: boolean
@@ -5209,12 +5298,23 @@ export namespace Prisma {
 
   export type AggregateSubtask = {
     _count: SubtaskCountAggregateOutputType | null
+    _avg: SubtaskAvgAggregateOutputType | null
+    _sum: SubtaskSumAggregateOutputType | null
     _min: SubtaskMinAggregateOutputType | null
     _max: SubtaskMaxAggregateOutputType | null
   }
 
+  export type SubtaskAvgAggregateOutputType = {
+    index: number | null
+  }
+
+  export type SubtaskSumAggregateOutputType = {
+    index: number | null
+  }
+
   export type SubtaskMinAggregateOutputType = {
     id: string | null
+    index: number | null
     title: string | null
     isCompleted: boolean | null
     taskId: string | null
@@ -5222,6 +5322,7 @@ export namespace Prisma {
 
   export type SubtaskMaxAggregateOutputType = {
     id: string | null
+    index: number | null
     title: string | null
     isCompleted: boolean | null
     taskId: string | null
@@ -5229,6 +5330,7 @@ export namespace Prisma {
 
   export type SubtaskCountAggregateOutputType = {
     id: number
+    index: number
     title: number
     isCompleted: number
     taskId: number
@@ -5236,8 +5338,17 @@ export namespace Prisma {
   }
 
 
+  export type SubtaskAvgAggregateInputType = {
+    index?: true
+  }
+
+  export type SubtaskSumAggregateInputType = {
+    index?: true
+  }
+
   export type SubtaskMinAggregateInputType = {
     id?: true
+    index?: true
     title?: true
     isCompleted?: true
     taskId?: true
@@ -5245,6 +5356,7 @@ export namespace Prisma {
 
   export type SubtaskMaxAggregateInputType = {
     id?: true
+    index?: true
     title?: true
     isCompleted?: true
     taskId?: true
@@ -5252,6 +5364,7 @@ export namespace Prisma {
 
   export type SubtaskCountAggregateInputType = {
     id?: true
+    index?: true
     title?: true
     isCompleted?: true
     taskId?: true
@@ -5296,6 +5409,18 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
+     * Select which fields to average
+    **/
+    _avg?: SubtaskAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: SubtaskSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: SubtaskMinAggregateInputType
@@ -5326,6 +5451,8 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: SubtaskCountAggregateInputType | true
+    _avg?: SubtaskAvgAggregateInputType
+    _sum?: SubtaskSumAggregateInputType
     _min?: SubtaskMinAggregateInputType
     _max?: SubtaskMaxAggregateInputType
   }
@@ -5333,10 +5460,13 @@ export namespace Prisma {
 
   export type SubtaskGroupByOutputType = {
     id: string
+    index: number
     title: string
     isCompleted: boolean
     taskId: string
     _count: SubtaskCountAggregateOutputType | null
+    _avg: SubtaskAvgAggregateOutputType | null
+    _sum: SubtaskSumAggregateOutputType | null
     _min: SubtaskMinAggregateOutputType | null
     _max: SubtaskMaxAggregateOutputType | null
   }
@@ -5357,6 +5487,7 @@ export namespace Prisma {
 
   export type SubtaskSelect<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    index?: boolean
     title?: boolean
     isCompleted?: boolean
     taskId?: boolean
@@ -5365,6 +5496,7 @@ export namespace Prisma {
 
   export type SubtaskSelectScalar = {
     id?: boolean
+    index?: boolean
     title?: boolean
     isCompleted?: boolean
     taskId?: boolean
@@ -6153,6 +6285,7 @@ export namespace Prisma {
 
   export const ColumnScalarFieldEnum: {
     id: 'id',
+    index: 'index',
     name: 'name',
     boardId: 'boardId'
   };
@@ -6162,6 +6295,7 @@ export namespace Prisma {
 
   export const TaskScalarFieldEnum: {
     id: 'id',
+    index: 'index',
     title: 'title',
     description: 'description',
     status: 'status',
@@ -6173,6 +6307,7 @@ export namespace Prisma {
 
   export const SubtaskScalarFieldEnum: {
     id: 'id',
+    index: 'index',
     title: 'title',
     isCompleted: 'isCompleted',
     taskId: 'taskId'
@@ -6305,6 +6440,7 @@ export namespace Prisma {
     OR?: Enumerable<ColumnWhereInput>
     NOT?: Enumerable<ColumnWhereInput>
     id?: StringFilter | string
+    index?: IntFilter | number
     name?: StringFilter | string
     boardId?: StringFilter | string
     board?: XOR<BoardRelationFilter, BoardWhereInput>
@@ -6313,6 +6449,7 @@ export namespace Prisma {
 
   export type ColumnOrderByWithRelationInput = {
     id?: SortOrder
+    index?: SortOrder
     name?: SortOrder
     boardId?: SortOrder
     board?: BoardOrderByWithRelationInput
@@ -6325,11 +6462,14 @@ export namespace Prisma {
 
   export type ColumnOrderByWithAggregationInput = {
     id?: SortOrder
+    index?: SortOrder
     name?: SortOrder
     boardId?: SortOrder
     _count?: ColumnCountOrderByAggregateInput
+    _avg?: ColumnAvgOrderByAggregateInput
     _max?: ColumnMaxOrderByAggregateInput
     _min?: ColumnMinOrderByAggregateInput
+    _sum?: ColumnSumOrderByAggregateInput
   }
 
   export type ColumnScalarWhereWithAggregatesInput = {
@@ -6337,6 +6477,7 @@ export namespace Prisma {
     OR?: Enumerable<ColumnScalarWhereWithAggregatesInput>
     NOT?: Enumerable<ColumnScalarWhereWithAggregatesInput>
     id?: StringWithAggregatesFilter | string
+    index?: IntWithAggregatesFilter | number
     name?: StringWithAggregatesFilter | string
     boardId?: StringWithAggregatesFilter | string
   }
@@ -6346,6 +6487,7 @@ export namespace Prisma {
     OR?: Enumerable<TaskWhereInput>
     NOT?: Enumerable<TaskWhereInput>
     id?: StringFilter | string
+    index?: IntFilter | number
     title?: StringFilter | string
     description?: StringFilter | string
     status?: StringFilter | string
@@ -6356,6 +6498,7 @@ export namespace Prisma {
 
   export type TaskOrderByWithRelationInput = {
     id?: SortOrder
+    index?: SortOrder
     title?: SortOrder
     description?: SortOrder
     status?: SortOrder
@@ -6370,13 +6513,16 @@ export namespace Prisma {
 
   export type TaskOrderByWithAggregationInput = {
     id?: SortOrder
+    index?: SortOrder
     title?: SortOrder
     description?: SortOrder
     status?: SortOrder
     columnId?: SortOrder
     _count?: TaskCountOrderByAggregateInput
+    _avg?: TaskAvgOrderByAggregateInput
     _max?: TaskMaxOrderByAggregateInput
     _min?: TaskMinOrderByAggregateInput
+    _sum?: TaskSumOrderByAggregateInput
   }
 
   export type TaskScalarWhereWithAggregatesInput = {
@@ -6384,6 +6530,7 @@ export namespace Prisma {
     OR?: Enumerable<TaskScalarWhereWithAggregatesInput>
     NOT?: Enumerable<TaskScalarWhereWithAggregatesInput>
     id?: StringWithAggregatesFilter | string
+    index?: IntWithAggregatesFilter | number
     title?: StringWithAggregatesFilter | string
     description?: StringWithAggregatesFilter | string
     status?: StringWithAggregatesFilter | string
@@ -6395,6 +6542,7 @@ export namespace Prisma {
     OR?: Enumerable<SubtaskWhereInput>
     NOT?: Enumerable<SubtaskWhereInput>
     id?: StringFilter | string
+    index?: IntFilter | number
     title?: StringFilter | string
     isCompleted?: BoolFilter | boolean
     taskId?: StringFilter | string
@@ -6403,6 +6551,7 @@ export namespace Prisma {
 
   export type SubtaskOrderByWithRelationInput = {
     id?: SortOrder
+    index?: SortOrder
     title?: SortOrder
     isCompleted?: SortOrder
     taskId?: SortOrder
@@ -6415,12 +6564,15 @@ export namespace Prisma {
 
   export type SubtaskOrderByWithAggregationInput = {
     id?: SortOrder
+    index?: SortOrder
     title?: SortOrder
     isCompleted?: SortOrder
     taskId?: SortOrder
     _count?: SubtaskCountOrderByAggregateInput
+    _avg?: SubtaskAvgOrderByAggregateInput
     _max?: SubtaskMaxOrderByAggregateInput
     _min?: SubtaskMinOrderByAggregateInput
+    _sum?: SubtaskSumOrderByAggregateInput
   }
 
   export type SubtaskScalarWhereWithAggregatesInput = {
@@ -6428,6 +6580,7 @@ export namespace Prisma {
     OR?: Enumerable<SubtaskScalarWhereWithAggregatesInput>
     NOT?: Enumerable<SubtaskScalarWhereWithAggregatesInput>
     id?: StringWithAggregatesFilter | string
+    index?: IntWithAggregatesFilter | number
     title?: StringWithAggregatesFilter | string
     isCompleted?: BoolWithAggregatesFilter | boolean
     taskId?: StringWithAggregatesFilter | string
@@ -6540,6 +6693,7 @@ export namespace Prisma {
 
   export type ColumnCreateInput = {
     id?: string
+    index?: number
     name: string
     board: BoardCreateNestedOneWithoutColumnsInput
     tasks?: TaskCreateNestedManyWithoutColumnInput
@@ -6547,6 +6701,7 @@ export namespace Prisma {
 
   export type ColumnUncheckedCreateInput = {
     id?: string
+    index?: number
     name: string
     boardId: string
     tasks?: TaskUncheckedCreateNestedManyWithoutColumnInput
@@ -6554,6 +6709,7 @@ export namespace Prisma {
 
   export type ColumnUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    index?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     board?: BoardUpdateOneRequiredWithoutColumnsNestedInput
     tasks?: TaskUpdateManyWithoutColumnNestedInput
@@ -6561,6 +6717,7 @@ export namespace Prisma {
 
   export type ColumnUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    index?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     boardId?: StringFieldUpdateOperationsInput | string
     tasks?: TaskUncheckedUpdateManyWithoutColumnNestedInput
@@ -6568,23 +6725,27 @@ export namespace Prisma {
 
   export type ColumnCreateManyInput = {
     id?: string
+    index?: number
     name: string
     boardId: string
   }
 
   export type ColumnUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
+    index?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
   }
 
   export type ColumnUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
+    index?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     boardId?: StringFieldUpdateOperationsInput | string
   }
 
   export type TaskCreateInput = {
     id?: string
+    index?: number
     title: string
     description: string
     status?: string
@@ -6594,6 +6755,7 @@ export namespace Prisma {
 
   export type TaskUncheckedCreateInput = {
     id?: string
+    index?: number
     title: string
     description: string
     status?: string
@@ -6603,6 +6765,7 @@ export namespace Prisma {
 
   export type TaskUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    index?: IntFieldUpdateOperationsInput | number
     title?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
@@ -6612,6 +6775,7 @@ export namespace Prisma {
 
   export type TaskUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    index?: IntFieldUpdateOperationsInput | number
     title?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
@@ -6621,6 +6785,7 @@ export namespace Prisma {
 
   export type TaskCreateManyInput = {
     id?: string
+    index?: number
     title: string
     description: string
     status?: string
@@ -6629,6 +6794,7 @@ export namespace Prisma {
 
   export type TaskUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
+    index?: IntFieldUpdateOperationsInput | number
     title?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
@@ -6636,6 +6802,7 @@ export namespace Prisma {
 
   export type TaskUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
+    index?: IntFieldUpdateOperationsInput | number
     title?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
@@ -6644,6 +6811,7 @@ export namespace Prisma {
 
   export type SubtaskCreateInput = {
     id?: string
+    index?: number
     title: string
     isCompleted?: boolean
     task: TaskCreateNestedOneWithoutSubtasksInput
@@ -6651,6 +6819,7 @@ export namespace Prisma {
 
   export type SubtaskUncheckedCreateInput = {
     id?: string
+    index?: number
     title: string
     isCompleted?: boolean
     taskId: string
@@ -6658,6 +6827,7 @@ export namespace Prisma {
 
   export type SubtaskUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    index?: IntFieldUpdateOperationsInput | number
     title?: StringFieldUpdateOperationsInput | string
     isCompleted?: BoolFieldUpdateOperationsInput | boolean
     task?: TaskUpdateOneRequiredWithoutSubtasksNestedInput
@@ -6665,6 +6835,7 @@ export namespace Prisma {
 
   export type SubtaskUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    index?: IntFieldUpdateOperationsInput | number
     title?: StringFieldUpdateOperationsInput | string
     isCompleted?: BoolFieldUpdateOperationsInput | boolean
     taskId?: StringFieldUpdateOperationsInput | string
@@ -6672,6 +6843,7 @@ export namespace Prisma {
 
   export type SubtaskCreateManyInput = {
     id?: string
+    index?: number
     title: string
     isCompleted?: boolean
     taskId: string
@@ -6679,12 +6851,14 @@ export namespace Prisma {
 
   export type SubtaskUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
+    index?: IntFieldUpdateOperationsInput | number
     title?: StringFieldUpdateOperationsInput | string
     isCompleted?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type SubtaskUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
+    index?: IntFieldUpdateOperationsInput | number
     title?: StringFieldUpdateOperationsInput | string
     isCompleted?: BoolFieldUpdateOperationsInput | boolean
     taskId?: StringFieldUpdateOperationsInput | string
@@ -6828,6 +7002,17 @@ export namespace Prisma {
     userId?: SortOrder
   }
 
+  export type IntFilter = {
+    equals?: number
+    in?: Enumerable<number> | number
+    notIn?: Enumerable<number> | number
+    lt?: number
+    lte?: number
+    gt?: number
+    gte?: number
+    not?: NestedIntFilter | number
+  }
+
   export type BoardRelationFilter = {
     is?: BoardWhereInput | null
     isNot?: BoardWhereInput | null
@@ -6845,20 +7030,47 @@ export namespace Prisma {
 
   export type ColumnCountOrderByAggregateInput = {
     id?: SortOrder
+    index?: SortOrder
     name?: SortOrder
     boardId?: SortOrder
   }
 
+  export type ColumnAvgOrderByAggregateInput = {
+    index?: SortOrder
+  }
+
   export type ColumnMaxOrderByAggregateInput = {
     id?: SortOrder
+    index?: SortOrder
     name?: SortOrder
     boardId?: SortOrder
   }
 
   export type ColumnMinOrderByAggregateInput = {
     id?: SortOrder
+    index?: SortOrder
     name?: SortOrder
     boardId?: SortOrder
+  }
+
+  export type ColumnSumOrderByAggregateInput = {
+    index?: SortOrder
+  }
+
+  export type IntWithAggregatesFilter = {
+    equals?: number
+    in?: Enumerable<number> | number
+    notIn?: Enumerable<number> | number
+    lt?: number
+    lte?: number
+    gt?: number
+    gte?: number
+    not?: NestedIntWithAggregatesFilter | number
+    _count?: NestedIntFilter
+    _avg?: NestedFloatFilter
+    _sum?: NestedIntFilter
+    _min?: NestedIntFilter
+    _max?: NestedIntFilter
   }
 
   export type ColumnRelationFilter = {
@@ -6878,14 +7090,20 @@ export namespace Prisma {
 
   export type TaskCountOrderByAggregateInput = {
     id?: SortOrder
+    index?: SortOrder
     title?: SortOrder
     description?: SortOrder
     status?: SortOrder
     columnId?: SortOrder
   }
 
+  export type TaskAvgOrderByAggregateInput = {
+    index?: SortOrder
+  }
+
   export type TaskMaxOrderByAggregateInput = {
     id?: SortOrder
+    index?: SortOrder
     title?: SortOrder
     description?: SortOrder
     status?: SortOrder
@@ -6894,10 +7112,15 @@ export namespace Prisma {
 
   export type TaskMinOrderByAggregateInput = {
     id?: SortOrder
+    index?: SortOrder
     title?: SortOrder
     description?: SortOrder
     status?: SortOrder
     columnId?: SortOrder
+  }
+
+  export type TaskSumOrderByAggregateInput = {
+    index?: SortOrder
   }
 
   export type BoolFilter = {
@@ -6912,13 +7135,19 @@ export namespace Prisma {
 
   export type SubtaskCountOrderByAggregateInput = {
     id?: SortOrder
+    index?: SortOrder
     title?: SortOrder
     isCompleted?: SortOrder
     taskId?: SortOrder
   }
 
+  export type SubtaskAvgOrderByAggregateInput = {
+    index?: SortOrder
+  }
+
   export type SubtaskMaxOrderByAggregateInput = {
     id?: SortOrder
+    index?: SortOrder
     title?: SortOrder
     isCompleted?: SortOrder
     taskId?: SortOrder
@@ -6926,9 +7155,14 @@ export namespace Prisma {
 
   export type SubtaskMinOrderByAggregateInput = {
     id?: SortOrder
+    index?: SortOrder
     title?: SortOrder
     isCompleted?: SortOrder
     taskId?: SortOrder
+  }
+
+  export type SubtaskSumOrderByAggregateInput = {
+    index?: SortOrder
   }
 
   export type BoolWithAggregatesFilter = {
@@ -7063,6 +7297,14 @@ export namespace Prisma {
     connectOrCreate?: Enumerable<TaskCreateOrConnectWithoutColumnInput>
     createMany?: TaskCreateManyColumnInputEnvelope
     connect?: Enumerable<TaskWhereUniqueInput>
+  }
+
+  export type IntFieldUpdateOperationsInput = {
+    set?: number
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
   }
 
   export type BoardUpdateOneRequiredWithoutColumnsNestedInput = {
@@ -7259,6 +7501,33 @@ export namespace Prisma {
     not?: NestedIntNullableFilter | number | null
   }
 
+  export type NestedIntWithAggregatesFilter = {
+    equals?: number
+    in?: Enumerable<number> | number
+    notIn?: Enumerable<number> | number
+    lt?: number
+    lte?: number
+    gt?: number
+    gte?: number
+    not?: NestedIntWithAggregatesFilter | number
+    _count?: NestedIntFilter
+    _avg?: NestedFloatFilter
+    _sum?: NestedIntFilter
+    _min?: NestedIntFilter
+    _max?: NestedIntFilter
+  }
+
+  export type NestedFloatFilter = {
+    equals?: number
+    in?: Enumerable<number> | number
+    notIn?: Enumerable<number> | number
+    lt?: number
+    lte?: number
+    gt?: number
+    gte?: number
+    not?: NestedFloatFilter | number
+  }
+
   export type NestedBoolFilter = {
     equals?: boolean
     not?: NestedBoolFilter | boolean
@@ -7342,12 +7611,14 @@ export namespace Prisma {
 
   export type ColumnCreateWithoutBoardInput = {
     id?: string
+    index?: number
     name: string
     tasks?: TaskCreateNestedManyWithoutColumnInput
   }
 
   export type ColumnUncheckedCreateWithoutBoardInput = {
     id?: string
+    index?: number
     name: string
     tasks?: TaskUncheckedCreateNestedManyWithoutColumnInput
   }
@@ -7404,6 +7675,7 @@ export namespace Prisma {
     OR?: Enumerable<ColumnScalarWhereInput>
     NOT?: Enumerable<ColumnScalarWhereInput>
     id?: StringFilter | string
+    index?: IntFilter | number
     name?: StringFilter | string
     boardId?: StringFilter | string
   }
@@ -7427,6 +7699,7 @@ export namespace Prisma {
 
   export type TaskCreateWithoutColumnInput = {
     id?: string
+    index?: number
     title: string
     description: string
     status?: string
@@ -7435,6 +7708,7 @@ export namespace Prisma {
 
   export type TaskUncheckedCreateWithoutColumnInput = {
     id?: string
+    index?: number
     title: string
     description: string
     status?: string
@@ -7489,6 +7763,7 @@ export namespace Prisma {
     OR?: Enumerable<TaskScalarWhereInput>
     NOT?: Enumerable<TaskScalarWhereInput>
     id?: StringFilter | string
+    index?: IntFilter | number
     title?: StringFilter | string
     description?: StringFilter | string
     status?: StringFilter | string
@@ -7497,12 +7772,14 @@ export namespace Prisma {
 
   export type ColumnCreateWithoutTasksInput = {
     id?: string
+    index?: number
     name: string
     board: BoardCreateNestedOneWithoutColumnsInput
   }
 
   export type ColumnUncheckedCreateWithoutTasksInput = {
     id?: string
+    index?: number
     name: string
     boardId: string
   }
@@ -7514,12 +7791,14 @@ export namespace Prisma {
 
   export type SubtaskCreateWithoutTaskInput = {
     id?: string
+    index?: number
     title: string
     isCompleted?: boolean
   }
 
   export type SubtaskUncheckedCreateWithoutTaskInput = {
     id?: string
+    index?: number
     title: string
     isCompleted?: boolean
   }
@@ -7541,12 +7820,14 @@ export namespace Prisma {
 
   export type ColumnUpdateWithoutTasksInput = {
     id?: StringFieldUpdateOperationsInput | string
+    index?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     board?: BoardUpdateOneRequiredWithoutColumnsNestedInput
   }
 
   export type ColumnUncheckedUpdateWithoutTasksInput = {
     id?: StringFieldUpdateOperationsInput | string
+    index?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     boardId?: StringFieldUpdateOperationsInput | string
   }
@@ -7572,6 +7853,7 @@ export namespace Prisma {
     OR?: Enumerable<SubtaskScalarWhereInput>
     NOT?: Enumerable<SubtaskScalarWhereInput>
     id?: StringFilter | string
+    index?: IntFilter | number
     title?: StringFilter | string
     isCompleted?: BoolFilter | boolean
     taskId?: StringFilter | string
@@ -7579,6 +7861,7 @@ export namespace Prisma {
 
   export type TaskCreateWithoutSubtasksInput = {
     id?: string
+    index?: number
     title: string
     description: string
     status?: string
@@ -7587,6 +7870,7 @@ export namespace Prisma {
 
   export type TaskUncheckedCreateWithoutSubtasksInput = {
     id?: string
+    index?: number
     title: string
     description: string
     status?: string
@@ -7605,6 +7889,7 @@ export namespace Prisma {
 
   export type TaskUpdateWithoutSubtasksInput = {
     id?: StringFieldUpdateOperationsInput | string
+    index?: IntFieldUpdateOperationsInput | number
     title?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
@@ -7613,6 +7898,7 @@ export namespace Prisma {
 
   export type TaskUncheckedUpdateWithoutSubtasksInput = {
     id?: StringFieldUpdateOperationsInput | string
+    index?: IntFieldUpdateOperationsInput | number
     title?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
@@ -7643,28 +7929,33 @@ export namespace Prisma {
 
   export type ColumnCreateManyBoardInput = {
     id?: string
+    index?: number
     name: string
   }
 
   export type ColumnUpdateWithoutBoardInput = {
     id?: StringFieldUpdateOperationsInput | string
+    index?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     tasks?: TaskUpdateManyWithoutColumnNestedInput
   }
 
   export type ColumnUncheckedUpdateWithoutBoardInput = {
     id?: StringFieldUpdateOperationsInput | string
+    index?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     tasks?: TaskUncheckedUpdateManyWithoutColumnNestedInput
   }
 
   export type ColumnUncheckedUpdateManyWithoutColumnsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    index?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
   }
 
   export type TaskCreateManyColumnInput = {
     id?: string
+    index?: number
     title: string
     description: string
     status?: string
@@ -7672,6 +7963,7 @@ export namespace Prisma {
 
   export type TaskUpdateWithoutColumnInput = {
     id?: StringFieldUpdateOperationsInput | string
+    index?: IntFieldUpdateOperationsInput | number
     title?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
@@ -7680,6 +7972,7 @@ export namespace Prisma {
 
   export type TaskUncheckedUpdateWithoutColumnInput = {
     id?: StringFieldUpdateOperationsInput | string
+    index?: IntFieldUpdateOperationsInput | number
     title?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
@@ -7688,6 +7981,7 @@ export namespace Prisma {
 
   export type TaskUncheckedUpdateManyWithoutTasksInput = {
     id?: StringFieldUpdateOperationsInput | string
+    index?: IntFieldUpdateOperationsInput | number
     title?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
@@ -7695,24 +7989,28 @@ export namespace Prisma {
 
   export type SubtaskCreateManyTaskInput = {
     id?: string
+    index?: number
     title: string
     isCompleted?: boolean
   }
 
   export type SubtaskUpdateWithoutTaskInput = {
     id?: StringFieldUpdateOperationsInput | string
+    index?: IntFieldUpdateOperationsInput | number
     title?: StringFieldUpdateOperationsInput | string
     isCompleted?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type SubtaskUncheckedUpdateWithoutTaskInput = {
     id?: StringFieldUpdateOperationsInput | string
+    index?: IntFieldUpdateOperationsInput | number
     title?: StringFieldUpdateOperationsInput | string
     isCompleted?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type SubtaskUncheckedUpdateManyWithoutSubtasksInput = {
     id?: StringFieldUpdateOperationsInput | string
+    index?: IntFieldUpdateOperationsInput | number
     title?: StringFieldUpdateOperationsInput | string
     isCompleted?: BoolFieldUpdateOperationsInput | boolean
   }

@@ -92,7 +92,7 @@ export const register = async (
     return res.status(200).json({ user, accessToken, refreshToken });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ error: "Server error" });
+    return res.status(500).json({ error: "Server error", status: 500 });
   }
 };
 
