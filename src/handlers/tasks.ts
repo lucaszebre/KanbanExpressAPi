@@ -1,19 +1,21 @@
 import { Request, Response } from "express";
 import prisma from "../db";
+import { TaskWithSubtasksSchema } from "../types";
 
 type AuthenticatedRequest = Request & {
   user?: { id: string; name: string; email: string };
 };
 
-export const updateTaskSubtask = async (
+export const updateTask = async (
   req: AuthenticatedRequest,
   res: Response
 ): Promise<Response> => {
   const { id } = req.params;
-  const { updatedTask, subtasksAdd, subtasksChangeName, subtasksToDelete } =
-    req.body;
+  const data = req.body;
 
   try {
+    const validateTask = TaskWithSubtasksSchema.parse(data);
+
     const task = await prisma.task.findUnique({
       where: { id },
       include: { subtasks: true },
@@ -23,43 +25,46 @@ export const updateTaskSubtask = async (
       return res.status(404).json({ error: "Task not found" });
     }
 
-    if (subtasksToDelete && subtasksToDelete.length > 0) {
-      await prisma.subtask.deleteMany({
-        where: {
-          id: { in: subtasksToDelete },
-        },
-      });
-    }
-
-    if (subtasksChangeName && subtasksChangeName.length > 0) {
-      const updateSubtasksPromises = subtasksChangeName.map((subtask) =>
-        prisma.subtask.update({
-          where: { id: subtask.id },
-          data: { title: subtask.title },
-        })
-      );
-      await Promise.all(updateSubtasksPromises);
-    }
-
-    if (subtasksAdd && subtasksAdd.length > 0) {
-      const addSubtasksPromises = subtasksAdd.map((title) =>
-        prisma.subtask.create({
-          data: {
-            title,
-            task: { connect: { id } },
-          },
-        })
-      );
-      await Promise.all(addSubtasksPromises);
-    }
-
     const updatedTaskResult = await prisma.task.update({
       where: { id },
-      data: updatedTask,
+      include: {
+        subtasks: true,
+      },
+      data: {
+        title: validateTask.title,
+        description: validateTask.description,
+        status: validateTask.status,
+
+        ...(validateTask.columnId && {
+          column: {
+            connect: { id: validateTask.columnId },
+          },
+        }),
+
+        subtasks: {
+          deleteMany: {
+            id: {
+              notIn: validateTask.subtasks.map((sub) => sub.id).filter(Boolean),
+            },
+          },
+          upsert: validateTask.subtasks.map((subtask) => ({
+            where: { id: subtask.id },
+            update: {
+              title: subtask.title,
+              isCompleted: subtask.isCompleted,
+            },
+            create: {
+              title: subtask.title,
+              isCompleted: subtask.isCompleted,
+            },
+          })),
+        },
+      },
     });
 
     return res.json(updatedTaskResult);
   } catch (error) {
+    console.error(error);
     return res.status(500).json({ error: "Server error" });
   }
 };

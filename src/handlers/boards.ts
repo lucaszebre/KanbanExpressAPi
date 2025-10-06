@@ -41,7 +41,7 @@ export const getOneBoard = async (
 export const getBoards = async (
   req: AuthenticatedRequest,
   res: Response
-): Promise<void> => {
+): Promise<Response> => {
   try {
     const boards = await prisma.user.findMany({
       where: {
@@ -75,11 +75,11 @@ export const getBoards = async (
       },
     });
 
-    res.json(boards);
+    return res.json(boards);
   } catch (error) {
     // Handle the error accordingly
     console.error(error);
-    res
+    return res
       .status(500)
       .json({ error: "An error occurred while fetching the boards" });
   }

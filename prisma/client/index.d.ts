@@ -22,6 +22,7 @@ export type UserPayload<ExtArgs extends $Extensions.Args = $Extensions.DefaultAr
     name: string
     email: string
     password: string
+    refreshToken: string | null
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -1453,6 +1454,7 @@ export namespace Prisma {
     name: string | null
     email: string | null
     password: string | null
+    refreshToken: string | null
   }
 
   export type UserMaxAggregateOutputType = {
@@ -1460,6 +1462,7 @@ export namespace Prisma {
     name: string | null
     email: string | null
     password: string | null
+    refreshToken: string | null
   }
 
   export type UserCountAggregateOutputType = {
@@ -1467,6 +1470,7 @@ export namespace Prisma {
     name: number
     email: number
     password: number
+    refreshToken: number
     _all: number
   }
 
@@ -1476,6 +1480,7 @@ export namespace Prisma {
     name?: true
     email?: true
     password?: true
+    refreshToken?: true
   }
 
   export type UserMaxAggregateInputType = {
@@ -1483,6 +1488,7 @@ export namespace Prisma {
     name?: true
     email?: true
     password?: true
+    refreshToken?: true
   }
 
   export type UserCountAggregateInputType = {
@@ -1490,6 +1496,7 @@ export namespace Prisma {
     name?: true
     email?: true
     password?: true
+    refreshToken?: true
     _all?: true
   }
 
@@ -1571,6 +1578,7 @@ export namespace Prisma {
     name: string
     email: string
     password: string
+    refreshToken: string | null
     _count: UserCountAggregateOutputType | null
     _min: UserMinAggregateOutputType | null
     _max: UserMaxAggregateOutputType | null
@@ -1595,6 +1603,7 @@ export namespace Prisma {
     name?: boolean
     email?: boolean
     password?: boolean
+    refreshToken?: boolean
     boards?: boolean | User$boardsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
@@ -1604,6 +1613,7 @@ export namespace Prisma {
     name?: boolean
     email?: boolean
     password?: boolean
+    refreshToken?: boolean
   }
 
   export type UserInclude<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
@@ -6125,7 +6135,8 @@ export namespace Prisma {
     id: 'id',
     name: 'name',
     email: 'email',
-    password: 'password'
+    password: 'password',
+    refreshToken: 'refreshToken'
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -6186,6 +6197,14 @@ export namespace Prisma {
   export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
 
 
+  export const NullsOrder: {
+    first: 'first',
+    last: 'last'
+  };
+
+  export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
   /**
    * Deep Input Types
    */
@@ -6199,6 +6218,7 @@ export namespace Prisma {
     name?: StringFilter | string
     email?: StringFilter | string
     password?: StringFilter | string
+    refreshToken?: StringNullableFilter | string | null
     boards?: BoardListRelationFilter
   }
 
@@ -6207,12 +6227,14 @@ export namespace Prisma {
     name?: SortOrder
     email?: SortOrder
     password?: SortOrder
+    refreshToken?: SortOrderInput | SortOrder
     boards?: BoardOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = {
     id?: string
     email?: string
+    refreshToken?: string
   }
 
   export type UserOrderByWithAggregationInput = {
@@ -6220,6 +6242,7 @@ export namespace Prisma {
     name?: SortOrder
     email?: SortOrder
     password?: SortOrder
+    refreshToken?: SortOrderInput | SortOrder
     _count?: UserCountOrderByAggregateInput
     _max?: UserMaxOrderByAggregateInput
     _min?: UserMinOrderByAggregateInput
@@ -6233,6 +6256,7 @@ export namespace Prisma {
     name?: StringWithAggregatesFilter | string
     email?: StringWithAggregatesFilter | string
     password?: StringWithAggregatesFilter | string
+    refreshToken?: StringNullableWithAggregatesFilter | string | null
   }
 
   export type BoardWhereInput = {
@@ -6414,6 +6438,7 @@ export namespace Prisma {
     name: string
     email: string
     password: string
+    refreshToken?: string | null
     boards?: BoardCreateNestedManyWithoutUserInput
   }
 
@@ -6422,6 +6447,7 @@ export namespace Prisma {
     name: string
     email: string
     password: string
+    refreshToken?: string | null
     boards?: BoardUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -6430,6 +6456,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
+    refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     boards?: BoardUpdateManyWithoutUserNestedInput
   }
 
@@ -6438,6 +6465,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
+    refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
     boards?: BoardUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -6446,6 +6474,7 @@ export namespace Prisma {
     name: string
     email: string
     password: string
+    refreshToken?: string | null
   }
 
   export type UserUpdateManyMutationInput = {
@@ -6453,6 +6482,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
+    refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type UserUncheckedUpdateManyInput = {
@@ -6460,6 +6490,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
+    refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type BoardCreateInput = {
@@ -6674,10 +6705,30 @@ export namespace Prisma {
     not?: NestedStringFilter | string
   }
 
+  export type StringNullableFilter = {
+    equals?: string | null
+    in?: Enumerable<string> | string | null
+    notIn?: Enumerable<string> | string | null
+    lt?: string
+    lte?: string
+    gt?: string
+    gte?: string
+    contains?: string
+    startsWith?: string
+    endsWith?: string
+    mode?: QueryMode
+    not?: NestedStringNullableFilter | string | null
+  }
+
   export type BoardListRelationFilter = {
     every?: BoardWhereInput
     some?: BoardWhereInput
     none?: BoardWhereInput
+  }
+
+  export type SortOrderInput = {
+    sort: SortOrder
+    nulls?: NullsOrder
   }
 
   export type BoardOrderByRelationAggregateInput = {
@@ -6689,6 +6740,7 @@ export namespace Prisma {
     name?: SortOrder
     email?: SortOrder
     password?: SortOrder
+    refreshToken?: SortOrder
   }
 
   export type UserMaxOrderByAggregateInput = {
@@ -6696,6 +6748,7 @@ export namespace Prisma {
     name?: SortOrder
     email?: SortOrder
     password?: SortOrder
+    refreshToken?: SortOrder
   }
 
   export type UserMinOrderByAggregateInput = {
@@ -6703,6 +6756,7 @@ export namespace Prisma {
     name?: SortOrder
     email?: SortOrder
     password?: SortOrder
+    refreshToken?: SortOrder
   }
 
   export type StringWithAggregatesFilter = {
@@ -6721,6 +6775,24 @@ export namespace Prisma {
     _count?: NestedIntFilter
     _min?: NestedStringFilter
     _max?: NestedStringFilter
+  }
+
+  export type StringNullableWithAggregatesFilter = {
+    equals?: string | null
+    in?: Enumerable<string> | string | null
+    notIn?: Enumerable<string> | string | null
+    lt?: string
+    lte?: string
+    gt?: string
+    gte?: string
+    contains?: string
+    startsWith?: string
+    endsWith?: string
+    mode?: QueryMode
+    not?: NestedStringNullableWithAggregatesFilter | string | null
+    _count?: NestedIntNullableFilter
+    _min?: NestedStringNullableFilter
+    _max?: NestedStringNullableFilter
   }
 
   export type UserRelationFilter = {
@@ -6883,6 +6955,10 @@ export namespace Prisma {
 
   export type StringFieldUpdateOperationsInput = {
     set?: string
+  }
+
+  export type NullableStringFieldUpdateOperationsInput = {
+    set?: string | null
   }
 
   export type BoardUpdateManyWithoutUserNestedInput = {
@@ -7113,6 +7189,20 @@ export namespace Prisma {
     not?: NestedStringFilter | string
   }
 
+  export type NestedStringNullableFilter = {
+    equals?: string | null
+    in?: Enumerable<string> | string | null
+    notIn?: Enumerable<string> | string | null
+    lt?: string
+    lte?: string
+    gt?: string
+    gte?: string
+    contains?: string
+    startsWith?: string
+    endsWith?: string
+    not?: NestedStringNullableFilter | string | null
+  }
+
   export type NestedStringWithAggregatesFilter = {
     equals?: string
     in?: Enumerable<string> | string
@@ -7139,6 +7229,34 @@ export namespace Prisma {
     gt?: number
     gte?: number
     not?: NestedIntFilter | number
+  }
+
+  export type NestedStringNullableWithAggregatesFilter = {
+    equals?: string | null
+    in?: Enumerable<string> | string | null
+    notIn?: Enumerable<string> | string | null
+    lt?: string
+    lte?: string
+    gt?: string
+    gte?: string
+    contains?: string
+    startsWith?: string
+    endsWith?: string
+    not?: NestedStringNullableWithAggregatesFilter | string | null
+    _count?: NestedIntNullableFilter
+    _min?: NestedStringNullableFilter
+    _max?: NestedStringNullableFilter
+  }
+
+  export type NestedIntNullableFilter = {
+    equals?: number | null
+    in?: Enumerable<number> | number | null
+    notIn?: Enumerable<number> | number | null
+    lt?: number
+    lte?: number
+    gt?: number
+    gte?: number
+    not?: NestedIntNullableFilter | number | null
   }
 
   export type NestedBoolFilter = {
@@ -7206,6 +7324,7 @@ export namespace Prisma {
     name: string
     email: string
     password: string
+    refreshToken?: string | null
   }
 
   export type UserUncheckedCreateWithoutBoardsInput = {
@@ -7213,6 +7332,7 @@ export namespace Prisma {
     name: string
     email: string
     password: string
+    refreshToken?: string | null
   }
 
   export type UserCreateOrConnectWithoutBoardsInput = {
@@ -7252,6 +7372,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
+    refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type UserUncheckedUpdateWithoutBoardsInput = {
@@ -7259,6 +7380,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
+    refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type ColumnUpsertWithWhereUniqueWithoutBoardInput = {

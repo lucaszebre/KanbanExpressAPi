@@ -1,16 +1,52 @@
+import { User } from "@prisma/client";
 import { Request, Response } from "express";
-import jwt from "jsonwebtoken";
+import { JwtPayload } from "jsonwebtoken";
 import prisma from "../db";
-import { comparePasswords, createJWT, hashPassword } from "../modules/auth";
+import env from "../env";
+import { comparePasswords, hashPassword } from "../modules/auth";
+import {
+  generateAccesToken,
+  generateTokenPair,
+  verifyAccesToken,
+} from "../utils/jwt.utils";
 
 type AuthenticatedRequest = Request & {
   user?: { id: string; name: string; email: string };
 };
 
-export const createNewUser = async (
+export const logout = async (
   req: AuthenticatedRequest,
   res: Response
-): Promise<Response> => {
+): Promise<void> => {
+  const { user } = req;
+
+  console.log(user, "user");
+  try {
+    const yolo = await prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        refreshToken: null,
+      },
+    });
+
+    console.log(yolo);
+    res.clearCookie("refreshToken");
+    res.clearCookie("accessToken");
+    res.setHeader("Clear-Site-Data", '"cache"');
+    res.end();
+  } catch (error) {
+    console.error("could not logout", error);
+  }
+};
+
+export const register = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<
+  Response<{ user: User; accesToken: string; refreshToken: string }>
+> => {
   try {
     const existingUser = await prisma.user.findUnique({
       where: {
@@ -30,18 +66,42 @@ export const createNewUser = async (
       },
     });
 
-    const token = await createJWT(user);
-    return res.status(200).json({ token });
+    const payload: JwtPayload = {
+      id: user.id,
+      email: user.email,
+    };
+
+    const { accessToken, refreshToken } = generateTokenPair(payload);
+
+    await prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        refreshToken,
+      },
+    });
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    return res.status(200).json({ user, accessToken, refreshToken });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: "Server error" });
   }
 };
 
-export const signin = async (
+export const login = async (
   req: AuthenticatedRequest,
   res: Response
-): Promise<Response> => {
+): Promise<
+  Response<{ user: User; accesToken: string; refreshToken: string }>
+> => {
   try {
     const { email, password } = req.body;
 
@@ -59,42 +119,101 @@ export const signin = async (
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    const isValid = await comparePasswords(password, user.password);
-
-    if (!isValid) {
+    const isPasswordValid = await comparePasswords(password, user.password);
+    if (!isPasswordValid) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    const token = createJWT(user);
-    return res.status(200).json({ token });
+    const payload: JwtPayload = {
+      id: user.id,
+      email: user.email,
+    };
+
+    const { accessToken, refreshToken } = generateTokenPair(payload);
+
+    await prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        refreshToken,
+      },
+    });
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    return res.status(200).json({ user, accessToken, refreshToken });
   } catch (error) {
-    console.error("Signin error:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };
 
-export const getUserJwt = async (
-  req: AuthenticatedRequest,
+export const refreshToken = async (
+  req: Request,
   res: Response
 ): Promise<Response> => {
-  const bearer = req.headers.authorization;
+  const { refreshToken } = req.cookies;
 
-  if (!bearer) {
-    return res.status(401).json({ message: "not authorized" });
-  }
-
-  const [, token] = bearer.split(" ");
-
-  if (!token) {
-    return res.status(401).json({ message: "not valid token" });
+  if (!refreshToken) {
+    res.status(401).json({ message: "need a refresh token" });
   }
 
   try {
-    const user = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = user;
-    return res.status(200).json(user);
+    const decoded = verifyAccesToken(refreshToken) as JwtPayload;
+
+    const user = await prisma.user.findUnique({
+      where: {
+        refreshToken,
+      },
+    });
+
+    console.log(user, "user");
+
+    if (!user) {
+      res.status(401).json({ message: "Invalid refresh token" });
+    }
+
+    if (decoded.id !== user.id) {
+      res.status(401).json({ message: "Invalid refresh token" });
+    }
+
+    if (decoded.email !== user.email) {
+      res.status(401).json({ message: "Invalid refresh token" });
+    }
+
+    const payload: JwtPayload = {
+      id: user.id,
+      email: user.email,
+    };
+
+    const accessToken = generateAccesToken(payload);
+
+    return res.status(200).json({ accessToken });
+  } catch (error) {}
+};
+
+export const getCurrentUser = (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<Response> => {
+  const bearer = req.cookies.accessToken;
+
+  if (!bearer) {
+    res.status(401).json({ message: "not authorized" });
+    return;
+  }
+
+  try {
+    const user = verifyAccesToken(bearer);
+
+    res.json({ id: user.id, email: user.email });
   } catch (e) {
-    console.error(e);
-    return res.status(401).json({ message: "not valid token" });
+    res.status(500).json({ message: "server error" });
+    return;
   }
 };

@@ -1,24 +1,31 @@
+import cookieParser from "cookie-parser";
 import cors from "cors";
 import express, { Application, NextFunction, Request, Response } from "express";
 import morgan from "morgan";
-import { createNewUser, signin } from "./handlers/user";
+import logger from "pino-http";
+import env from "./env";
+import { login, register } from "./handlers/user";
 import { protect } from "./modules/auth";
 import router from "./router";
-
 const app: Application = express();
 
 app.use(
   cors({
-    origin: process.env.TRUST_ORIGIN,
+    origin: env.TRUST_ORIGIN || "http://localhost:3000",
     methods: ["GET", "PATCH", "POST", "DELETE", "HEAD"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-App-Identifier"],
+    credentials: true,
   })
 );
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(logger());
 
-app.post("/register", createNewUser);
-app.post("/login", signin);
+app.use(cookieParser());
+
+app.post("/register", register);
+app.post("/login", login);
 
 app.use("/api", protect, router);
 

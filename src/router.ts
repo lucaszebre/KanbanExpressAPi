@@ -18,8 +18,9 @@ import {
   deleteTask,
   getTask,
   moveTaskToColumn,
-  updateTaskSubtask,
+  updateTask,
 } from "./handlers/tasks";
+import { getCurrentUser, logout, refreshToken } from "./handlers/user";
 
 const router: Router = Router();
 
@@ -38,27 +39,18 @@ router.delete("/columns/:id", deleteColumn);
 router.post("/columns/:id/tasks", addTaskColumn);
 
 // Tasks
-router.patch("/tasks/:id", updateTaskSubtask);
+router.patch("/tasks/:id", updateTask);
 router.delete("/tasks/:id", deleteTask);
 router.get("/tasks/:id", getTask);
 router.patch("/tasks/:id/column/:columnId", moveTaskToColumn);
 
 // Subtasks
-router.patch("/subtask/:id", updateSubTask);
+router.patch("/subtasks/:id", updateSubTask);
 
-// router.put("/verify", (req: Request, res: Response): void => {
-//   const authHeader = req.headers["authorization"] as string | undefined;
-//   const token = authHeader && authHeader.split(" ")[1];
+//user
 
-//   if (token == null) return res.sendStatus(401);
+router.patch("/refresh-token", refreshToken);
+router.post("/logout", logout);
+router.get("/me", getCurrentUser);
 
-//   jwt.verify(
-//     token,
-//     process.env.JWT_SECRET as string,
-//     (err: jwt.VerifyErrors | null, user: string | JwtPayload | undefined) => {
-//       if (err) return res.sendStatus(403);
-//       return res.status(200).json({ valid: true, user });
-//     }
-//   );
-// });
 export default router;

@@ -49,7 +49,7 @@ export const addTaskColumn = async (
           connect: { id },
         },
         subtasks: {
-          create: subtasks.map((title) => ({ title })),
+          create: subtasks,
         },
       },
     });
