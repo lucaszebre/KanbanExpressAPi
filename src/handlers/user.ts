@@ -4,6 +4,7 @@ import { JwtPayload } from "jsonwebtoken";
 import prisma from "../db";
 import env from "../env";
 import { comparePasswords, hashPassword } from "../modules/auth";
+import { CreateUserSchema, LoginSchema } from "../types";
 import {
   generateAccesToken,
   generateTokenPair,
@@ -20,9 +21,8 @@ export const logout = async (
 ): Promise<void> => {
   const { user } = req;
 
-  console.log(user, "user");
   try {
-    const yolo = await prisma.user.update({
+    await prisma.user.update({
       where: {
         id: user.id,
       },
@@ -31,7 +31,6 @@ export const logout = async (
       },
     });
 
-    console.log(yolo);
     res.clearCookie("refreshToken");
     res.clearCookie("accessToken");
     res.setHeader("Clear-Site-Data", '"cache"');
@@ -47,6 +46,7 @@ export const register = async (
 ): Promise<
   Response<{ user: User; accesToken: string; refreshToken: string }>
 > => {
+  const { name, email, password } = CreateUserSchema.parse(req.body);
   try {
     const existingUser = await prisma.user.findUnique({
       where: {
@@ -60,9 +60,9 @@ export const register = async (
 
     const user = await prisma.user.create({
       data: {
-        email: req.body.email,
-        password: await hashPassword(req.body.password),
-        name: req.body.name,
+        email: email,
+        password: await hashPassword(password),
+        name: name,
       },
     });
 
@@ -103,7 +103,7 @@ export const login = async (
   Response<{ user: User; accesToken: string; refreshToken: string }>
 > => {
   try {
-    const { email, password } = req.body;
+    const { email, password } = LoginSchema.parse(req.body);
 
     if (!email || !password) {
       return res
