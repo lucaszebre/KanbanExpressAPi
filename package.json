@@ -7,9 +7,9 @@
   "scripts": {
     "dev": "npx tsx --env-file=.env --watch  src/index.ts",
     "migrate": "npx prisma migrate dev",
-    "start": "npx prisma migrate deploy && npx ts-node src/index.ts",
-    "build": "tsc",
-    "postinstall": "npm run build"
+    "start": "node dist/index.js",
+    "build": "prisma generate && tsc",
+    "postinstall": "prisma generate"
   },
   "keywords": [],
   "author": "",
