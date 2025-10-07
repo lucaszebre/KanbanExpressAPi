@@ -10,16 +10,15 @@ export const updateTask = async (
   req: AuthenticatedRequest,
   res: Response
 ): Promise<Response> => {
-  const { id } = req.params;
-
-  const validation = UpdateTaskWithSubtasksBodySchema.safeParse(req.body);
-  if (!validation.success) {
-    return res.status(400).json({ error: validation.error.issues });
-  }
-
-  const data = validation.data;
-
   try {
+    const { id } = req.params;
+
+    const validation = UpdateTaskWithSubtasksBodySchema.safeParse(req.body);
+    if (!validation.success) {
+      return res.status(400).json({ error: validation.error.issues });
+    }
+
+    const data = validation.data;
     const task = await prisma.task.findUnique({
       where: { id },
       include: { subtasks: true },

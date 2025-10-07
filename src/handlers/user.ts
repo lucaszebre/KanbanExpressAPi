@@ -158,7 +158,6 @@ export const refreshToken = async (
   res: Response
 ): Promise<Response> => {
   const { refreshToken } = req.cookies;
-  console.log("refreshToken", refreshToken);
   if (!refreshToken) {
     res.status(401).json({ message: "need a refresh token" });
   }
@@ -171,8 +170,6 @@ export const refreshToken = async (
         refreshToken,
       },
     });
-
-    console.log(user, "user");
 
     if (!user) {
       res.status(401).json({ message: "Invalid refresh token" });
@@ -195,7 +192,7 @@ export const refreshToken = async (
 
     return res.status(200).json({ accessToken });
   } catch (error) {
-    console.log(error, "error");
+    console.error(error, "error");
   }
 };
 
