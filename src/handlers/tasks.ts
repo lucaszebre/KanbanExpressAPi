@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import prisma from "../db";
-import { UpdateTaskWithSubtasksBodySchema } from "../types";
+import prisma from "../db.js";
+import { UpdateTaskWithSubtasksBodySchema } from "../types/index.js";
 
 type AuthenticatedRequest = Request & {
   user?: { id: string; name: string; email: string };

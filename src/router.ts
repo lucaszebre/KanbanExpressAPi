@@ -5,22 +5,22 @@ import {
   getBoards,
   getOneBoard,
   updateboard,
-} from "./handlers/boards";
+} from "./handlers/boards.js";
 import {
   addTaskColumn,
   createColumns,
   deleteColumn,
   getColumn,
   updateColumn,
-} from "./handlers/column";
-import { updateSubTask } from "./handlers/subtask";
+} from "./handlers/column.js";
+import { updateSubTask } from "./handlers/subtask.js";
 import {
   deleteTask,
   getTask,
   moveTaskToColumn,
   updateTask,
-} from "./handlers/tasks";
-import { getCurrentUser, logout, refreshToken } from "./handlers/user";
+} from "./handlers/tasks.js";
+import { getCurrentUser, logout, refreshToken } from "./handlers/user.js";
 
 const router: Router = Router();
 

@@ -3,6 +3,8 @@
     "sourceMap": true,
     "outDir": "dist",
     "lib": ["esnext"],
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
     "esModuleInterop": true
   }
 }

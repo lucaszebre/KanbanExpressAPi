@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
-import prisma from "../db";
+import prisma from "../db.js";
 import {
   CreateColumnSchema,
   CreateTaskWithSubtasksSchema,
   UpdateColumnBodySchema,
-} from "../types";
+} from "../types/index.js";
 
 type AuthenticatedRequest = Request & {
   user?: { id: string; name: string; email: string };

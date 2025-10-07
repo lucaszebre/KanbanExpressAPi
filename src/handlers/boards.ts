@@ -1,6 +1,9 @@
 import { Request, Response } from "express";
-import prisma from "../db";
-import { BoardWithColumnsSchema, CreateBoardWithColumnsSchema } from "../types";
+import prisma from "../db.js";
+import {
+  BoardWithColumnsSchema,
+  CreateBoardWithColumnsSchema,
+} from "../types/index.js";
 
 type AuthenticatedRequest = Request & {
   user?: { id: string; name: string; email: string };

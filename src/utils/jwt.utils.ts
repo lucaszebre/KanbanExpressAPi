@@ -1,6 +1,6 @@
 import jwt, { JwtPayload, SignOptions } from "jsonwebtoken";
 import ms from "ms";
-import env from "../env";
+import env from "../env.js";
 export const generateAccesToken = (payload: JwtPayload): string => {
   const privateKey = env.PRIVATE_KEY_ACCESS;
   const options: SignOptions = {

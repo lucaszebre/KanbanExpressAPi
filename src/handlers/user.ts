@@ -1,15 +1,15 @@
-import { User } from "@prisma/client";
 import { Request, Response } from "express";
 import { JwtPayload } from "jsonwebtoken";
-import prisma from "../db";
-import env from "../env";
-import { comparePasswords, hashPassword } from "../modules/auth";
-import { CreateUserSchema, LoginSchema } from "../types";
+import { User } from "../../prisma/client/index.js";
+import prisma from "../db.js";
+import env from "../env.js";
+import { comparePasswords, hashPassword } from "../modules/auth/index.js";
+import { CreateUserSchema, LoginSchema } from "../types/index.js";
 import {
   generateAccesToken,
   generateTokenPair,
   verifyAccesToken,
-} from "../utils/jwt.utils";
+} from "../utils/jwt.utils.js";
 
 type AuthenticatedRequest = Request & {
   user?: { id: string; name: string; email: string };

@@ -2,11 +2,10 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import express, { Application, NextFunction, Request, Response } from "express";
 import morgan from "morgan";
-import logger from "pino-http";
-import env from "./env";
-import { login, register } from "./handlers/user";
-import { protect } from "./modules/auth";
-import router from "./router";
+import env from "./env.js";
+import { login, register } from "./handlers/user.js";
+import { protect } from "./modules/auth/index.js";
+import router from "./router.js";
 const app: Application = express();
 
 app.use(
@@ -20,7 +19,6 @@ app.use(
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(logger());
 
 app.use(cookieParser());
 
