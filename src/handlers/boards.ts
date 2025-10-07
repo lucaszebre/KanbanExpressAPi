@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import prisma from "../db";
-import { CreateBoardWithColumnsSchema } from "../types";
+import { BoardWithColumnsSchema, CreateBoardWithColumnsSchema } from "../types";
 
 type AuthenticatedRequest = Request & {
   user?: { id: string; name: string; email: string };
@@ -44,7 +44,7 @@ export const getBoards = async (
   res: Response
 ): Promise<Response> => {
   try {
-    const boards = await prisma.user.findMany({
+    const boards = await prisma.user.findUnique({
       where: {
         id: req.user.id,
       },
@@ -54,19 +54,12 @@ export const getBoards = async (
         name: true,
         email: true,
         boards: {
-          select: {
-            id: true,
-            name: true,
+          include: {
             columns: {
-              select: {
-                id: true,
-                name: true,
+              include: {
                 tasks: {
-                  select: {
-                    id: true,
-                    title: true,
+                  include: {
                     subtasks: true,
-                    description: true,
                   },
                 },
               },
@@ -78,8 +71,6 @@ export const getBoards = async (
 
     return res.json(boards);
   } catch (error) {
-    // Handle the error accordingly
-    console.error(error);
     return res
       .status(500)
       .json({ error: "An error occurred while fetching the boards" });
@@ -96,7 +87,6 @@ export const createboard = async (
       res.status(400).json({ error: validation.error.issues });
       return;
     }
-    // Assuming user and product IDs are provided in the request body
     const { name, columns } = validation.data;
 
     const newBoard = await prisma.board.create({
@@ -130,33 +120,66 @@ export const updateboard = async (
   res: Response
 ): Promise<Response> => {
   try {
-    if (req.params.id) {
+    const validatedBoard = BoardWithColumnsSchema.safeParse(req.body);
+
+    if (!validatedBoard.success) {
+      res.status(400).json({ error: validatedBoard.error.issues });
+      return;
+    }
+
+    const { id } = req.params;
+    if (id) {
       const board = await prisma.board.findUnique({
         where: {
-          id: req.params.id,
+          id,
         },
       });
       if (!board) {
         return res.status(404).json({ error: "Board not found" });
-      } else {
-        const updatedUpdate = await prisma.board.update({
-          where: { id: req.params.id },
-          data: req.body,
-          include: {
-            columns: {
-              include: {
-                tasks: {
-                  include: {
-                    subtasks: true,
+      }
+
+      const data = validatedBoard.data;
+
+      const updatedUpdate = await prisma.board.update({
+        where: { id },
+        data: {
+          ...data,
+
+          columns: data?.columns
+            ? {
+                deleteMany: {
+                  id: {
+                    notIn: data.columns.map((d) => d.id),
                   },
+                },
+                upsert: data.columns.map(({ id, name }) => ({
+                  where: {
+                    id,
+                  },
+                  update: {
+                    name,
+                  },
+                  create: {
+                    name,
+                  },
+                })),
+              }
+            : {},
+        },
+        include: {
+          columns: {
+            include: {
+              tasks: {
+                include: {
+                  subtasks: true,
                 },
               },
             },
           },
-        });
+        },
+      });
 
-        res.json({ data: updatedUpdate });
-      }
+      res.json({ data: updatedUpdate });
     } else {
       return res.status(404).json({ error: "Need an id" });
     }

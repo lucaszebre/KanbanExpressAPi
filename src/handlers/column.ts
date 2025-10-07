@@ -1,5 +1,10 @@
 import { Request, Response } from "express";
 import prisma from "../db";
+import {
+  CreateColumnSchema,
+  CreateTaskWithSubtasksSchema,
+  UpdateColumnBodySchema,
+} from "../types";
 
 type AuthenticatedRequest = Request & {
   user?: { id: string; name: string; email: string };
@@ -10,15 +15,20 @@ export const createColumns = async (
   res: Response
 ): Promise<Response> => {
   try {
-    const { name } = req.body;
-    if (!name || !req.params.boardId) {
-      return res.status(400).json({ error: "Name and boardId are required" });
+    const validation = CreateColumnSchema.safeParse({
+      ...req.body,
+      boardId: req.params.boardId,
+    });
+    if (!validation.success) {
+      return res.status(400).json({ error: validation.error.issues });
     }
+
+    const { name, boardId } = validation.data;
 
     const newColumn = await prisma.column.create({
       data: {
         name,
-        boardId: req.params.boardId,
+        boardId,
       },
     });
 
@@ -34,7 +44,13 @@ export const addTaskColumn = async (
   res: Response
 ): Promise<Response> => {
   const { id } = req.params;
-  const { subtasks, ...newTask } = req.body;
+
+  const validation = CreateTaskWithSubtasksSchema.safeParse(req.body);
+  if (!validation.success) {
+    return res.status(400).json({ error: validation.error.issues });
+  }
+
+  const { subtasks, ...newTask } = validation.data;
 
   try {
     const column = await prisma.column.findUnique({ where: { id } });
@@ -90,10 +106,16 @@ export const updateColumn = async (
   res: Response
 ): Promise<Response> => {
   const { id } = req.params;
+
+  const validation = UpdateColumnBodySchema.safeParse(req.body);
+  if (!validation.success) {
+    return res.status(400).json({ error: validation.error.issues });
+  }
+
   try {
     const updatedColumn = await prisma.column.update({
       where: { id },
-      data: req.body,
+      data: validation.data,
     });
     return res.status(201).json(updatedColumn);
   } catch (error) {

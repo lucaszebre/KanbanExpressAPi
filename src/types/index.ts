@@ -12,13 +12,12 @@ export const UserSchema = z.object({
 export const BoardSchema = z.object({
   id: z.uuid(),
   name: z.string(),
-  userId: z.uuid(),
 });
 
 export const ColumnSchema = z.object({
   id: z.uuid(),
   name: z.string(),
-  boardId: z.uuid(),
+  boardId: z.uuid().optional(),
 });
 
 export const TaskSchema = z.object({
@@ -66,6 +65,12 @@ export const CreateSubtaskSchema = z.object({
   taskId: z.string().uuid("Invalid task ID format"),
 });
 
+export const CreateTaskWithSubtasksSchema = CreateTaskSchema.omit({
+  columnId: true,
+}).extend({
+  subtasks: z.array(CreateSubtaskSchema.omit({ taskId: true })).optional(),
+});
+
 export const CreateBoardWithColumnsSchema = z.object({
   name: z.string().min(1, "Board name is required"),
   columns: z.array(z.string().min(1, "Column name is required")).optional(),
@@ -93,6 +98,35 @@ export const UpdateColumnSchema = z.object({
   id: z.uuid(),
   name: z.string().min(1, "Column name is required").optional(),
   boardId: z.string().uuid("Invalid board ID format").optional(),
+});
+
+export const UpdateColumnBodySchema = UpdateColumnSchema.omit({
+  id: true,
+  boardId: true,
+});
+
+export const UpdateSubtaskBodySchema = z.object({
+  title: z.string().min(1, "Subtask title is required").optional(),
+  isCompleted: z.boolean().optional(),
+});
+
+export const UpdateTaskBodySchema = z.object({
+  title: z.string().min(1, "Task title is required").optional(),
+  description: z.string().optional(),
+  status: z.string().optional(),
+  columnId: z.string().uuid("Invalid column ID format").optional(),
+});
+
+export const UpdateTaskWithSubtasksBodySchema = UpdateTaskBodySchema.extend({
+  subtasks: z
+    .array(
+      z.object({
+        id: z.string().uuid().optional(),
+        title: z.string().min(1, "Subtask title is required"),
+        isCompleted: z.boolean(),
+      })
+    )
+    .optional(),
 });
 
 export const UpdateTaskSchema = z.object({
@@ -144,7 +178,6 @@ export const UserWithBoardsSchema = UserSchema.extend({
 
 export const BoardWithColumnsSchema = BoardSchema.extend({
   columns: z.array(ColumnSchema).optional(),
-  user: UserSchema.optional(),
 });
 
 export const ColumnWithTasksSchema = ColumnSchema.extend({
@@ -174,6 +207,9 @@ export type CreateBoard = z.infer<typeof CreateBoardSchema>;
 export type CreateColumn = z.infer<typeof CreateColumnSchema>;
 export type CreateTask = z.infer<typeof CreateTaskSchema>;
 export type CreateSubtask = z.infer<typeof CreateSubtaskSchema>;
+export type CreateTaskWithSubtasks = z.infer<
+  typeof CreateTaskWithSubtasksSchema
+>;
 
 export type UpdateUser = z.infer<typeof UpdateUserSchema>;
 export type UpdateBoard = z.infer<typeof UpdateBoardSchema>;

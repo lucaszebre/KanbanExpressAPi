@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import prisma from "../db";
-import { TaskWithSubtasksSchema } from "../types";
+import { UpdateTaskWithSubtasksBodySchema } from "../types";
 
 type AuthenticatedRequest = Request & {
   user?: { id: string; name: string; email: string };
@@ -11,11 +11,15 @@ export const updateTask = async (
   res: Response
 ): Promise<Response> => {
   const { id } = req.params;
-  const data = req.body;
+
+  const validation = UpdateTaskWithSubtasksBodySchema.safeParse(req.body);
+  if (!validation.success) {
+    return res.status(400).json({ error: validation.error.issues });
+  }
+
+  const data = validation.data;
 
   try {
-    const validateTask = TaskWithSubtasksSchema.parse(data);
-
     const task = await prisma.task.findUnique({
       where: { id },
       include: { subtasks: true },
@@ -31,34 +35,36 @@ export const updateTask = async (
         subtasks: true,
       },
       data: {
-        title: validateTask.title,
-        description: validateTask.description,
-        status: validateTask.status,
+        title: data.title,
+        description: data.description,
+        status: data.status,
 
-        ...(validateTask.columnId && {
+        ...(data.columnId && {
           column: {
-            connect: { id: validateTask.columnId },
+            connect: { id: data.columnId },
           },
         }),
 
-        subtasks: {
-          deleteMany: {
-            id: {
-              notIn: validateTask.subtasks.map((sub) => sub.id).filter(Boolean),
-            },
-          },
-          upsert: validateTask.subtasks.map((subtask) => ({
-            where: { id: subtask.id },
-            update: {
-              title: subtask.title,
-              isCompleted: subtask.isCompleted,
-            },
-            create: {
-              title: subtask.title,
-              isCompleted: subtask.isCompleted,
-            },
-          })),
-        },
+        subtasks: data.subtasks
+          ? {
+              deleteMany: {
+                id: {
+                  notIn: data.subtasks.map((sub) => sub.id).filter(Boolean),
+                },
+              },
+              upsert: data.subtasks.map((subtask) => ({
+                where: { id: subtask.id || "" },
+                update: {
+                  title: subtask.title,
+                  isCompleted: subtask.isCompleted,
+                },
+                create: {
+                  title: subtask.title,
+                  isCompleted: subtask.isCompleted,
+                },
+              })),
+            }
+          : undefined,
       },
     });
 

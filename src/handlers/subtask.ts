@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import prisma from "../db";
+import { CreateSubtaskSchema, UpdateSubtaskBodySchema } from "../types";
 
 type AuthenticatedRequest = Request & {
   user?: { id: string; name: string; email: string };
@@ -27,8 +28,12 @@ export const createSubTask = async (
   res: Response
 ): Promise<Response> => {
   try {
+    const validation = CreateSubtaskSchema.safeParse(req.body);
+    if (!validation.success) {
+      return res.status(400).json({ error: validation.error.issues });
+    }
     const newSubtask = await prisma.subtask.create({
-      data: req.body,
+      data: validation.data,
     });
     return res.status(201).json(newSubtask);
   } catch (error) {
@@ -40,9 +45,13 @@ export const updateSubTask = async (
   res: Response
 ): Promise<Response> => {
   try {
+    const validation = UpdateSubtaskBodySchema.safeParse(req.body);
+    if (!validation.success) {
+      return res.status(400).json({ error: validation.error.issues });
+    }
     const updatedSubtask = await prisma.subtask.update({
       where: { id: req.params.id },
-      data: req.body,
+      data: validation.data,
     });
     return res.status(200).json(updatedSubtask);
   } catch (error) {
