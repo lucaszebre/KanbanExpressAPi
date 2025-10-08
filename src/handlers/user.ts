@@ -91,11 +91,18 @@ export const register = async (c: Context<HonoContext>) => {
     setCookie(c, "refreshToken", refreshToken, {
       httpOnly: true,
       secure: true,
-      sameSite: "Strict",
+      sameSite: "None", // Changed from "Strict" to "None" for cross-origin requests
       maxAge: 7 * 24 * 60 * 60, // 7 days
     });
 
-    return c.json({ user, accessToken, refreshToken });
+    setCookie(c, "accessToken", accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None", // Changed from "Strict" to "None" for cross-origin requests
+      maxAge: 15 * 60, // 15 minutes
+    });
+
+    return c.json({ user, message: "Registration successful" });
   } catch (error) {
     console.error(error);
     return c.json({ error: "Server error" }, 500);
@@ -150,11 +157,18 @@ export const login = async (c: Context<HonoContext>) => {
     setCookie(c, "refreshToken", refreshToken, {
       httpOnly: true,
       secure: true,
-      sameSite: "Strict",
+      sameSite: "None", // Changed from "Strict" to "None" for cross-origin requests
       maxAge: 7 * 24 * 60 * 60, // 7 days
     });
 
-    return c.json({ user, accessToken, refreshToken });
+    setCookie(c, "accessToken", accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None", // Changed from "Strict" to "None" for cross-origin requests
+      maxAge: 15 * 60, // 15 minutes
+    });
+
+    return c.json({ user, message: "Login successful" });
   } catch (error) {
     console.error(error);
     return c.json({ message: "Internal server error" }, 500);
@@ -203,7 +217,14 @@ export const refreshToken = async (c: Context<HonoContext>) => {
       c.env.JWT_ACCESS_SECRET
     );
 
-    return c.json({ accessToken });
+    setCookie(c, "accessToken", accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None", // Changed from "Strict" to "None" for cross-origin requests
+      maxAge: 15 * 60, // 15 minutes
+    });
+
+    return c.json({ message: "Token refreshed successfully" });
   } catch (error) {
     console.error(error);
     return c.json({ message: "Invalid refresh token" }, 401);
@@ -215,13 +236,7 @@ export const getCurrentUser = async (c: Context<HonoContext>) => {
     const accessToken = getCookie(c, "accessToken");
 
     if (!accessToken) {
-      return c.json(
-        {
-          message: "Not authorized",
-          status: `${accessToken} ahahah inside the get currentUser`,
-        },
-        401
-      );
+      return c.json({ message: "No access token found in cookies" }, 401);
     }
 
     const user = await verifyAccessToken(accessToken, c.env.JWT_ACCESS_SECRET);
