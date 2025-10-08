@@ -48,17 +48,20 @@ export const LoginSchema = z.object({
 export const CreateColumnSchema = z.object({
   name: z.string().min(1, "Column name is required"),
   boardId: z.string().min(1, "Board ID is required"),
+  index: z.number(),
 });
 
 export const CreateTaskWithSubtasksSchema = z.object({
   title: z.string().min(1, "Task title is required"),
   description: z.string(),
   status: z.string().optional().default("Todo"),
+  index: z.number(),
   subtasks: z
     .array(
       z.object({
         title: z.string().min(1, "Subtask title is required"),
         isCompleted: z.boolean().optional().default(false),
+        index: z.number(),
       })
     )
     .optional(),
@@ -72,6 +75,7 @@ export const CreateSubtaskSchema = z.object({
   title: z.string().min(1, "Subtask title is required"),
   isCompleted: z.boolean().optional().default(false),
   taskId: z.string().min(1, "Task ID is required"),
+  index: z.number(),
 });
 
 export const UpdateSubtaskBodySchema = z.object({
@@ -87,7 +91,7 @@ export const UpdateTaskWithSubtasksBodySchema = z.object({
   subtasks: z
     .array(
       z.object({
-        id: z.string().optional(),
+        id: z.string(),
         title: z.string().min(1, "Subtask title is required"),
         isCompleted: z.boolean(),
       })

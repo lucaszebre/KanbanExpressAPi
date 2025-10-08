@@ -28,6 +28,7 @@ export const createColumns = async (c: Context<HonoContext>) => {
       data: {
         name,
         boardId: validatedBoardId,
+        index: validation.data.index,
       },
     });
 
@@ -60,6 +61,7 @@ export const addTaskColumn = async (c: Context<HonoContext>) => {
     const createdTask = await prisma.task.create({
       data: {
         ...newTask,
+        index: validation.data.index,
         column: {
           connect: { id: columnId },
         },

@@ -48,22 +48,26 @@ export const updateTask = async (c: Context<HonoContext>) => {
           ? {
               deleteMany: {
                 id: {
-                  notIn: data.subtasks.map((sub) => sub.id).filter(Boolean),
+                  notIn: data?.subtasks
+                    .map((sub) => sub.id)
+                    .filter((id): id is string => typeof id === "string"),
                 },
               },
-              upsert: data.subtasks.map((subtask) => ({
+              upsert: data.subtasks.map((subtask, index) => ({
                 where: { id: subtask.id || "" },
                 update: {
                   title: subtask.title,
                   isCompleted: subtask.isCompleted,
+                  index,
                 },
                 create: {
                   title: subtask.title,
                   isCompleted: subtask.isCompleted,
+                  index,
                 },
               })),
             }
-          : undefined,
+          : { set: [] },
       },
     });
 
