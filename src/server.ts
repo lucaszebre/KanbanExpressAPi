@@ -6,6 +6,7 @@ import env from "./env.js";
 import { login, register } from "./handlers/user.js";
 import { protect } from "./modules/auth/index.js";
 import router from "./router.js";
+
 const app: Application = express();
 
 app.use(
