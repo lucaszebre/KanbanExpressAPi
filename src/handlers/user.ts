@@ -215,7 +215,13 @@ export const getCurrentUser = async (c: Context<HonoContext>) => {
     const accessToken = getCookie(c, "accessToken");
 
     if (!accessToken) {
-      return c.json({ message: "Not authorized" }, 401);
+      return c.json(
+        {
+          message: "Not authorized",
+          accessToken,
+        },
+        401
+      );
     }
 
     const user = await verifyAccessToken(accessToken, c.env.JWT_ACCESS_SECRET);
