@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "hono-app",
+  "name": "kanbanbackend",
   "main": "src/index.ts",
   "compatibility_flags": ["nodejs_compat"],
   "compatibility_date": "2025-10-08",
@@ -15,5 +15,12 @@
       "database_id": "ea3f8fcd-6604-4ad2-a998-302718ef649c",
       "remote": true
     }
-  ]
+  ],
+  "vars": {
+    "TRUST_ORIGIN": "https://kanbanwithapi.onrender.com",
+    "JWT_REFRESH_EXPIRES_IN": "7d",
+    "JWT_ACCESS_EXPIRES_IN": "1h",
+    "JWT_ISSUER": "kanban-app",
+    "JWT_AUDIENCE": "kanban-users"
+  }
 }
