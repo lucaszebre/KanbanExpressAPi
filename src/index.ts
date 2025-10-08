@@ -1,7 +1,6 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
-import env from "../env.js";
 import { login, register } from "./handlers/user.js";
 import { protect } from "./middleware/auth.js";
 import router from "./router.js";
@@ -31,7 +30,7 @@ const app = new Hono<{
 app.use(
   "*",
   cors({
-    origin: env.TRUST_ORIGIN || "http://localhost:3000",
+    origin: (_, c) => c.env.TRUST_ORIGIN || "http://localhost:3000",
     allowHeaders: ["Content-Type", "Authorization", "X-App-Identifier"],
     allowMethods: ["GET", "PATCH", "POST", "DELETE", "HEAD"],
     credentials: true,
