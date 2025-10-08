@@ -13,7 +13,7 @@ export const protect = async (c: Context<HonoContext>, next: Next) => {
 
     const user = await verifyAccessToken(bearer, c.env.JWT_ACCESS_SECRET);
 
-    c.set("userId", user.sub as string);
+    c.set("userId", user.id as string);
 
     await next();
   } catch (e) {
