@@ -8,10 +8,7 @@ export const protect = async (c: Context<HonoContext>, next: Next) => {
     const bearer = getCookie(c, "accessToken");
 
     if (!bearer) {
-      return c.json(
-        { message: "not authorized", mesage: `${bearer} inside protect` },
-        401
-      );
+      return c.json({ message: `${bearer} inside protect` }, 404);
     }
 
     const user = await verifyAccessToken(bearer, c.env.JWT_ACCESS_SECRET);
