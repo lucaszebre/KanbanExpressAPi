@@ -57,7 +57,7 @@ export const register = async (c: Context<HonoContext>) => {
     });
 
     if (existingUser) {
-      return c.json({ error: "Email already in use" }, 404);
+      return c.json({ error: "Email already in use" }, 401);
     }
 
     const user = await prisma.user.create({
@@ -91,15 +91,15 @@ export const register = async (c: Context<HonoContext>) => {
     setCookie(c, "refreshToken", refreshToken, {
       httpOnly: true,
       secure: true,
-      sameSite: "None", // Changed from "Strict" to "None" for cross-origin requests
-      maxAge: 7 * 24 * 60 * 60, // 7 days
+      sameSite: "None",
+      maxAge: 7 * 24 * 60 * 60,
     });
 
     setCookie(c, "accessToken", accessToken, {
       httpOnly: true,
       secure: true,
-      sameSite: "None", // Changed from "Strict" to "None" for cross-origin requests
-      maxAge: 60 * 60, // 15 minutes
+      sameSite: "None",
+      maxAge: 60 * 60,
     });
 
     return c.json({ user, message: "Registration successful" });
@@ -157,15 +157,15 @@ export const login = async (c: Context<HonoContext>) => {
     setCookie(c, "refreshToken", refreshToken, {
       httpOnly: true,
       secure: true,
-      sameSite: "None", // Changed from "Strict" to "None" for cross-origin requests
-      maxAge: 7 * 24 * 60 * 60, // 7 days
+      sameSite: "None",
+      maxAge: 7 * 24 * 60 * 60,
     });
 
     setCookie(c, "accessToken", accessToken, {
       httpOnly: true,
       secure: true,
-      sameSite: "None", // Changed from "Strict" to "None" for cross-origin requests
-      maxAge: 60 * 60, // 15 minutes
+      sameSite: "None",
+      maxAge: 60 * 60,
     });
 
     return c.json({ user, message: "Login successful" });
@@ -220,8 +220,8 @@ export const refreshToken = async (c: Context<HonoContext>) => {
     setCookie(c, "accessToken", accessToken, {
       httpOnly: true,
       secure: true,
-      sameSite: "None", // Changed from "Strict" to "None" for cross-origin requests
-      maxAge: 60 * 60, // 15 minutes
+      sameSite: "None",
+      maxAge: 60 * 60,
     });
 
     return c.json({ message: "Token refreshed successfully" });
