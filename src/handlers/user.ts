@@ -218,7 +218,7 @@ export const getCurrentUser = async (c: Context<HonoContext>) => {
       return c.json(
         {
           message: "Not authorized",
-          accessToken,
+          status: `${accessToken} ahahah inside the get currentUser`,
         },
         401
       );
