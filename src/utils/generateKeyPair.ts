@@ -1,3 +1,8 @@
+// This file is no longer needed for Cloudflare Workers deployment
+// as we now use HMAC (symmetric) keys instead of RSA (asymmetric) keys
+// which are compatible with the WebCrypto API in Cloudflare Workers
+
+/*
 import * as crypto from "crypto";
 import * as fs from "fs";
 import * as path from "path";
@@ -27,3 +32,4 @@ export const genKeyPair = () => {
 };
 
 genKeyPair();
+*/

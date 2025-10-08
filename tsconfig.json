@@ -1,11 +1,14 @@
 {
   "compilerOptions": {
-    "sourceMap": true,
-    "outDir": "dist",
-    "lib": ["esnext"],
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
-    "esModuleInterop": true
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "skipLibCheck": true,
+    "lib": [
+      "ESNext"
+    ],
+    "jsx": "react-jsx",
+    "jsxImportSource": "hono/jsx"
   },
-  "include": ["src", "prisma/schema.prisma"]
 }

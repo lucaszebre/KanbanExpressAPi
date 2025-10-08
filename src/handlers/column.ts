@@ -1,89 +1,88 @@
-import { Request, Response } from "express";
-import prisma from "../db.js";
+import { Context } from "hono";
+import prismaClients from "../lib/prismaClient.js";
 import {
   CreateColumnSchema,
   CreateTaskWithSubtasksSchema,
+  HonoContext,
   UpdateColumnBodySchema,
 } from "../types/index.js";
 
-type AuthenticatedRequest = Request & {
-  user?: { id: string; name: string; email: string };
-};
-
-export const createColumns = async (
-  req: AuthenticatedRequest,
-  res: Response
-): Promise<Response> => {
+export const createColumns = async (c: Context<HonoContext>) => {
   try {
+    const boardId = c.req.param("boardId");
+    const body = await c.req.json();
+
     const validation = CreateColumnSchema.safeParse({
-      ...req.body,
-      boardId: req.params.boardId,
+      ...body,
+      boardId: boardId,
     });
+
     if (!validation.success) {
-      return res.status(400).json({ error: validation.error.issues });
+      return c.json({ error: validation.error.issues }, 400);
     }
 
-    const { name, boardId } = validation.data;
+    const { name, boardId: validatedBoardId } = validation.data;
+    const prisma = await prismaClients.fetch(c.env.DB);
 
     const newColumn = await prisma.column.create({
       data: {
         name,
-        boardId,
+        boardId: validatedBoardId,
       },
     });
 
-    return res.status(201).json(newColumn);
+    return c.json(newColumn, 201);
   } catch (error) {
     console.error("Error creating column: ", error);
-    return res.status(500).send(error.message);
+    return c.json({ error: "server error" }, 500);
   }
 };
 
-export const addTaskColumn = async (
-  req: AuthenticatedRequest,
-  res: Response
-): Promise<Response> => {
-  const { id } = req.params;
-
-  const validation = CreateTaskWithSubtasksSchema.safeParse(req.body);
-  if (!validation.success) {
-    return res.status(400).json({ error: validation.error.issues });
-  }
-
-  const { subtasks, ...newTask } = validation.data;
-
+export const addTaskColumn = async (c: Context<HonoContext>) => {
   try {
-    const column = await prisma.column.findUnique({ where: { id } });
+    const columnId = c.req.param("id");
+    const body = await c.req.json();
+
+    const validation = CreateTaskWithSubtasksSchema.safeParse(body);
+
+    if (!validation.success) {
+      return c.json({ error: validation.error.issues }, 400);
+    }
+
+    const { subtasks, ...newTask } = validation.data;
+    const prisma = await prismaClients.fetch(c.env.DB);
+
+    const column = await prisma.column.findUnique({ where: { id: columnId } });
     if (!column) {
-      return res.status(404).send("Column not found");
+      return c.json({ error: "Column not found" }, 404);
     }
 
     const createdTask = await prisma.task.create({
       data: {
         ...newTask,
         column: {
-          connect: { id },
+          connect: { id: columnId },
         },
         subtasks: {
           create: subtasks,
         },
       },
     });
-    return res.status(201).json(createdTask);
+
+    return c.json(createdTask, 201);
   } catch (error) {
     console.error(error);
-    return res.status(500).send(error.message);
+    return c.json({ error: "server error" }, 500);
   }
 };
 
-export const getColumn = async (
-  req: AuthenticatedRequest,
-  res: Response
-): Promise<Response> => {
-  const { id } = req.params;
+export const getColumn = async (c: Context<HonoContext>) => {
   try {
+    const columnId = c.req.param("id");
+    const prisma = await prismaClients.fetch(c.env.DB);
+
     const column = await prisma.column.findUnique({
-      where: { id },
+      where: { id: columnId },
       include: {
         tasks: {
           include: {
@@ -92,48 +91,55 @@ export const getColumn = async (
         },
       },
     });
+
     if (!column) {
-      return res.status(404).json({ error: "Column not found" });
+      return c.json({ error: "Column not found" }, 404);
     }
-    return res.status(200).json(column);
+
+    return c.json(column);
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    console.error(error);
+    return c.json({ error: "server error" }, 500);
   }
 };
 
-export const updateColumn = async (
-  req: AuthenticatedRequest,
-  res: Response
-): Promise<Response> => {
-  const { id } = req.params;
-
-  const validation = UpdateColumnBodySchema.safeParse(req.body);
-  if (!validation.success) {
-    return res.status(400).json({ error: validation.error.issues });
-  }
-
+export const updateColumn = async (c: Context<HonoContext>) => {
   try {
+    const columnId = c.req.param("id");
+    const body = await c.req.json();
+
+    const validation = UpdateColumnBodySchema.safeParse(body);
+
+    if (!validation.success) {
+      return c.json({ error: validation.error.issues }, 400);
+    }
+
+    const prisma = await prismaClients.fetch(c.env.DB);
+
     const updatedColumn = await prisma.column.update({
-      where: { id },
+      where: { id: columnId },
       data: validation.data,
     });
-    return res.status(201).json(updatedColumn);
+
+    return c.json(updatedColumn, 201);
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    console.error(error);
+    return c.json({ error: "server error" }, 500);
   }
 };
 
-export const deleteColumn = async (
-  req: AuthenticatedRequest,
-  res: Response
-): Promise<Response> => {
-  const { id } = req.params;
+export const deleteColumn = async (c: Context<HonoContext>) => {
   try {
+    const columnId = c.req.param("id");
+    const prisma = await prismaClients.fetch(c.env.DB);
+
     const deletedColumn = await prisma.column.delete({
-      where: { id },
+      where: { id: columnId },
     });
-    return res.status(200).json(deletedColumn);
+
+    return c.json(deletedColumn);
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    console.error(error);
+    return c.json({ error: "server error" }, 500);
   }
 };

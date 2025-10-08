@@ -4,12 +4,13 @@
 generator client {
   provider = "prisma-client-js"
   output = "./client"
+  previewFeatures = ["driverAdapters"]
+  engineType = "library"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "sqlite"
+  url = "file:./dev.db"
 }
 
 // This is your Prisma schema file,
@@ -35,7 +36,7 @@ model Board {
 
 model Column {
   id      String   @id @default(uuid())
-  index   Int @default(autoincrement())
+  index   Int 
   name    String
   boardId String
   board   Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
@@ -44,7 +45,7 @@ model Column {
 
 model Task {
   id          String   @id @default(uuid())
-  index Int @default(autoincrement())
+  index Int 
   title       String
   description String   
   status      String   @default("Todo")
@@ -55,7 +56,7 @@ model Task {
 
 model Subtask {
   id          String @id @default(uuid())
-  index Int @default(autoincrement())
+  index Int 
   title       String 
   isCompleted Boolean @default(false)
   taskId      String

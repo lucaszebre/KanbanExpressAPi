@@ -1,61 +1,63 @@
-import { Request, Response } from "express";
-import { JwtPayload } from "jsonwebtoken";
-import { User } from "../../prisma/client/index.js";
-import prisma from "../db.js";
-import env from "../env.js";
-import { comparePasswords, hashPassword } from "../modules/auth/index.js";
-import { CreateUserSchema, LoginSchema } from "../types/index.js";
+import { Context } from "hono";
+import { deleteCookie, getCookie, setCookie } from "hono/cookie";
+import prismaClients from "../lib/prismaClient.js";
+import { CreateUserSchema, HonoContext, LoginSchema } from "../types/index.js";
+import { comparePasswords, hashPassword } from "../utils/auth.js";
 import {
-  generateAccesToken,
+  generateAccessToken,
   generateTokenPair,
-  verifyAccesToken,
+  verifyAccessToken,
 } from "../utils/jwt.utils.js";
 
-type AuthenticatedRequest = Request & {
-  user?: { id: string; name: string; email: string };
-};
-
-export const logout = async (
-  req: AuthenticatedRequest,
-  res: Response
-): Promise<void> => {
-  const { user } = req;
-
+export const logout = async (c: Context<HonoContext>) => {
   try {
+    const userId = c.get("userId");
+
+    if (!userId) {
+      return c.json({ error: "User not authenticated" }, 401);
+    }
+
+    const prisma = await prismaClients.fetch(c.env.DB);
+
     await prisma.user.update({
       where: {
-        id: user.id,
+        id: userId,
       },
       data: {
         refreshToken: null,
       },
     });
 
-    res.clearCookie("refreshToken");
-    res.clearCookie("accessToken");
-    res.setHeader("Clear-Site-Data", '"cache"');
-    res.end();
+    deleteCookie(c, "refreshToken");
+    deleteCookie(c, "accessToken");
+
+    return c.json({ message: "Logged out successfully" });
   } catch (error) {
-    console.error("could not logout", error);
+    console.error("Could not logout", error);
+    return c.json({ error: "Server error" }, 500);
   }
 };
 
-export const register = async (
-  req: AuthenticatedRequest,
-  res: Response
-): Promise<
-  Response<{ user: User; accesToken: string; refreshToken: string }>
-> => {
-  const { name, email, password } = CreateUserSchema.parse(req.body);
+export const register = async (c: Context<HonoContext>) => {
   try {
+    const body = await c.req.json();
+    const validation = CreateUserSchema.safeParse(body);
+
+    if (!validation.success) {
+      return c.json({ error: validation.error.issues }, 400);
+    }
+
+    const { name, email, password } = validation.data;
+    const prisma = await prismaClients.fetch(c.env.DB);
+
     const existingUser = await prisma.user.findUnique({
       where: {
-        email: req.body.email,
+        email: email,
       },
     });
 
     if (existingUser) {
-      return res.status(404).json({ error: "Email already in use" });
+      return c.json({ error: "Email already in use" }, 404);
     }
 
     const user = await prisma.user.create({
@@ -66,12 +68,16 @@ export const register = async (
       },
     });
 
-    const payload: JwtPayload = {
+    const payload = {
       id: user.id,
       email: user.email,
     };
 
-    const { accessToken, refreshToken } = generateTokenPair(payload);
+    const { accessToken, refreshToken } = await generateTokenPair(
+      payload,
+      c.env.JWT_ACCESS_SECRET,
+      c.env.JWT_REFRESH_SECRET
+    );
 
     await prisma.user.update({
       where: {
@@ -82,54 +88,55 @@ export const register = async (
       },
     });
 
-    res.cookie("refreshToken", refreshToken, {
+    setCookie(c, "refreshToken", refreshToken, {
       httpOnly: true,
-      secure: env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      secure: true,
+      sameSite: "Strict",
+      maxAge: 7 * 24 * 60 * 60, // 7 days
     });
 
-    return res.status(200).json({ user, accessToken, refreshToken });
+    return c.json({ user, accessToken, refreshToken });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ error: "Server error", status: 500 });
+    return c.json({ error: "Server error" }, 500);
   }
 };
 
-export const login = async (
-  req: AuthenticatedRequest,
-  res: Response
-): Promise<
-  Response<{ user: User; accesToken: string; refreshToken: string }>
-> => {
+export const login = async (c: Context<HonoContext>) => {
   try {
-    const { email, password } = LoginSchema.parse(req.body);
+    const body = await c.req.json();
+    const validation = LoginSchema.safeParse(body);
 
-    if (!email || !password) {
-      return res
-        .status(400)
-        .json({ message: "Email and password are required" });
+    if (!validation.success) {
+      return c.json({ error: validation.error.issues }, 400);
     }
+
+    const { email, password } = validation.data;
+    const prisma = await prismaClients.fetch(c.env.DB);
 
     const user = await prisma.user.findUnique({
       where: { email },
     });
 
     if (!user) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return c.json({ message: "Invalid credentials" }, 401);
     }
 
     const isPasswordValid = await comparePasswords(password, user.password);
     if (!isPasswordValid) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return c.json({ message: "Invalid credentials" }, 401);
     }
 
-    const payload: JwtPayload = {
+    const payload = {
       id: user.id,
       email: user.email,
     };
 
-    const { accessToken, refreshToken } = generateTokenPair(payload);
+    const { accessToken, refreshToken } = await generateTokenPair(
+      payload,
+      c.env.JWT_ACCESS_SECRET,
+      c.env.JWT_REFRESH_SECRET
+    );
 
     await prisma.user.update({
       where: {
@@ -140,30 +147,33 @@ export const login = async (
       },
     });
 
-    res.cookie("refreshToken", refreshToken, {
+    setCookie(c, "refreshToken", refreshToken, {
       httpOnly: true,
-      secure: env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      secure: true,
+      sameSite: "Strict",
+      maxAge: 7 * 24 * 60 * 60, // 7 days
     });
 
-    return res.status(200).json({ user, accessToken, refreshToken });
+    return c.json({ user, accessToken, refreshToken });
   } catch (error) {
-    return res.status(500).json({ message: "Internal server error", error });
+    console.error(error);
+    return c.json({ message: "Internal server error" }, 500);
   }
 };
 
-export const refreshToken = async (
-  req: Request,
-  res: Response
-): Promise<Response> => {
-  const { refreshToken } = req.cookies;
-  if (!refreshToken) {
-    res.status(401).json({ message: "need a refresh token" });
-  }
-
+export const refreshToken = async (c: Context<HonoContext>) => {
   try {
-    const decoded = verifyAccesToken(refreshToken) as JwtPayload;
+    const refreshToken = getCookie(c, "refreshToken");
+
+    if (!refreshToken) {
+      return c.json({ message: "Need a refresh token" }, 401);
+    }
+
+    const decoded = await verifyAccessToken(
+      refreshToken,
+      c.env.JWT_REFRESH_SECRET
+    );
+    const prisma = await prismaClients.fetch(c.env.DB);
 
     const user = await prisma.user.findUnique({
       where: {
@@ -172,47 +182,47 @@ export const refreshToken = async (
     });
 
     if (!user) {
-      res.status(401).json({ message: "Invalid refresh token" });
+      return c.json({ message: "Invalid refresh token" }, 401);
     }
 
     if (decoded.id !== user.id) {
-      res.status(401).json({ message: "Invalid refresh token" });
+      return c.json({ message: "Invalid refresh token" }, 401);
     }
 
     if (decoded.email !== user.email) {
-      res.status(401).json({ message: "Invalid refresh token" });
+      return c.json({ message: "Invalid refresh token" }, 401);
     }
 
-    const payload: JwtPayload = {
+    const payload = {
       id: user.id,
       email: user.email,
     };
 
-    const accessToken = generateAccesToken(payload);
+    const accessToken = await generateAccessToken(
+      payload,
+      c.env.JWT_ACCESS_SECRET
+    );
 
-    return res.status(200).json({ accessToken });
+    return c.json({ accessToken });
   } catch (error) {
-    console.error(error, "error");
+    console.error(error);
+    return c.json({ message: "Invalid refresh token" }, 401);
   }
 };
 
-export const getCurrentUser = (
-  req: AuthenticatedRequest,
-  res: Response
-): Promise<Response> => {
-  const bearer = req.cookies.accessToken;
-
-  if (!bearer) {
-    res.status(401).json({ message: "not authorized" });
-    return;
-  }
-
+export const getCurrentUser = async (c: Context<HonoContext>) => {
   try {
-    const user = verifyAccesToken(bearer);
+    const accessToken = getCookie(c, "accessToken");
 
-    res.json({ id: user.id, email: user.email });
-  } catch (e) {
-    res.status(500).json({ message: "server error" });
-    return;
+    if (!accessToken) {
+      return c.json({ message: "Not authorized" }, 401);
+    }
+
+    const user = await verifyAccessToken(accessToken, c.env.JWT_ACCESS_SECRET);
+
+    return c.json({ id: user.id, email: user.email });
+  } catch (error) {
+    console.error(error);
+    return c.json({ message: "Server error" }, 500);
   }
 };

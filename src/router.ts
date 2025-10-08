@@ -1,11 +1,11 @@
-import { Router } from "express";
+import { Hono } from "hono";
 import {
-  createboard,
-  deleteboard,
+  createBoard,
+  deleteBoard,
   getBoards,
   getOneBoard,
-  updateboard,
-} from "./handlers/boards.js";
+  updateBoard,
+} from "./handlers/board.js";
 import {
   addTaskColumn,
   createColumns,
@@ -13,44 +13,47 @@ import {
   getColumn,
   updateColumn,
 } from "./handlers/column.js";
-import { updateSubTask } from "./handlers/subtask.js";
+import {
+  createSubTask,
+  deleteSubtask,
+  getSubTask,
+  updateSubTask,
+} from "./handlers/subtask.js";
 import {
   deleteTask,
   getTask,
   moveTaskToColumn,
   updateTask,
-} from "./handlers/tasks.js";
+} from "./handlers/task.js";
 import { getCurrentUser, logout, refreshToken } from "./handlers/user.js";
+import { HonoContext } from "./types/index.js";
 
-const router: Router = Router();
+const router = new Hono<HonoContext>();
 
-// Boards
-router.post("/boards", createboard);
-router.patch("/boards/:id", updateboard);
-router.delete("/boards/:boardId", deleteboard);
-router.get("/boards/:boardId", getOneBoard);
+router.post("/logout", logout);
+router.patch("/refresh-token", refreshToken);
+router.get("/me", getCurrentUser);
+
+router.post("/boards", createBoard);
 router.get("/boards", getBoards);
+router.get("/boards/:boardId", getOneBoard);
+router.patch("/boards/:id", updateBoard);
+router.delete("/boards/:boardId", deleteBoard);
 
-// Columns
 router.post("/boards/:boardId/columns", createColumns);
 router.get("/columns/:id", getColumn);
 router.patch("/columns/:id", updateColumn);
 router.delete("/columns/:id", deleteColumn);
 router.post("/columns/:id/tasks", addTaskColumn);
 
-// Tasks
+router.get("/tasks/:id", getTask);
 router.patch("/tasks/:id", updateTask);
 router.delete("/tasks/:id", deleteTask);
-router.get("/tasks/:id", getTask);
 router.patch("/tasks/:id/column/:columnId", moveTaskToColumn);
 
-// Subtasks
+router.get("/subtasks/:id", getSubTask);
+router.post("/subtasks", createSubTask);
 router.patch("/subtasks/:id", updateSubTask);
-
-//user
-
-router.patch("/refresh-token", refreshToken);
-router.post("/logout", logout);
-router.get("/me", getCurrentUser);
+router.delete("/subtasks/:id", deleteSubtask);
 
 export default router;
