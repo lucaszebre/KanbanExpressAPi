@@ -12,8 +12,7 @@
     {
       "binding": "DB",
       "database_name": "Kanban",
-      "database_id": "ea3f8fcd-6604-4ad2-a998-302718ef649c",
-      "remote": true
+      "database_id": "ea3f8fcd-6604-4ad2-a998-302718ef649c"
     }
   ],
   "vars": {

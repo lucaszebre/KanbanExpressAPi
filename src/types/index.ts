@@ -19,19 +19,19 @@ export const ColumnSchema = z.object({
   boardId: z.string().optional(),
 });
 
+export const SubtaskSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  isCompleted: z.boolean().default(false),
+});
+
 export const TaskSchema = z.object({
   id: z.string(),
   title: z.string(),
   description: z.string(),
   status: z.string().default("Todo"),
   columnId: z.string(),
-});
-
-export const SubtaskSchema = z.object({
-  id: z.string(),
-  title: z.string(),
-  isCompleted: z.boolean().default(false),
-  taskId: z.string(),
+  subtasks: z.array(SubtaskSchema).optional(),
 });
 
 export const CreateUserSchema = z.object({
@@ -69,6 +69,19 @@ export const CreateTaskWithSubtasksSchema = z.object({
 
 export const UpdateColumnBodySchema = z.object({
   name: z.string().min(1, "Column name is required").optional(),
+  index: z.number(),
+  tasks: z.array(TaskSchema).optional(),
+});
+
+export const UpdateColumnsBodySchema = z.object({
+  columns: z.array(
+    z.object({
+      id: z.string().min(1, "Column ID is required"),
+      name: z.string().min(1, "Column name is required").optional(),
+      index: z.number(),
+      tasks: z.array(TaskSchema).optional(),
+    })
+  ),
 });
 
 export const CreateSubtaskSchema = z.object({
@@ -85,6 +98,7 @@ export const UpdateSubtaskBodySchema = z.object({
 
 export const UpdateTaskWithSubtasksBodySchema = z.object({
   title: z.string().min(1, "Task title is required").optional(),
+  index: z.number(),
   description: z.string().optional(),
   status: z.string().optional(),
   columnId: z.string().optional(),
@@ -131,6 +145,7 @@ export type CreateTaskWithSubtasks = z.infer<
   typeof CreateTaskWithSubtasksSchema
 >;
 export type UpdateColumnBody = z.infer<typeof UpdateColumnBodySchema>;
+export type UpdateColumnsBody = z.infer<typeof UpdateColumnsBodySchema>;
 export type CreateSubtask = z.infer<typeof CreateSubtaskSchema>;
 export type UpdateSubtaskBody = z.infer<typeof UpdateSubtaskBodySchema>;
 export type UpdateTaskWithSubtasksBody = z.infer<

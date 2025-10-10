@@ -37,7 +37,7 @@ export const updateTask = async (c: Context<HonoContext>) => {
         title: data.title,
         description: data.description,
         status: data.status,
-
+        index: data.index,
         ...(data.columnId && {
           column: {
             connect: { id: data.columnId },

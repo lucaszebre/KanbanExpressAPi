@@ -5,6 +5,7 @@ import {
   CreateTaskWithSubtasksSchema,
   HonoContext,
   UpdateColumnBodySchema,
+  UpdateColumnsBodySchema,
 } from "../types/index.js";
 
 export const createColumns = async (c: Context<HonoContext>) => {
@@ -105,6 +106,97 @@ export const getColumn = async (c: Context<HonoContext>) => {
   }
 };
 
+export const updateColumns = async (c: Context<HonoContext>) => {
+  try {
+    const boardId = c.req.param("boardId");
+    const body = await c.req.json();
+
+    const validation = UpdateColumnsBodySchema.safeParse(body);
+
+    if (!validation.success) {
+      return c.json({ error: validation.error.issues }, 400);
+    }
+
+    const prisma = await prismaClients.fetch(c.env.DB);
+
+    // Verify board exists
+    const board = await prisma.board.findUnique({ where: { id: boardId } });
+    if (!board) {
+      return c.json({ error: "Board not found" }, 404);
+    }
+
+    const { columns } = validation.data;
+
+    // Update each column using the same logic as updateColumn
+    const updatedColumns = await Promise.all(
+      columns.map(async (columnData) => {
+        const { id, ...updateData } = columnData;
+
+        return await prisma.column.update({
+          where: { id },
+          data: {
+            ...updateData,
+            tasks: {
+              deleteMany: {
+                id: {
+                  notIn: updateData.tasks?.map((t) => t.id),
+                },
+              },
+              upsert: updateData.tasks?.map(
+                ({ description, id, status, title, subtasks }, index) => ({
+                  where: {
+                    id,
+                  },
+                  update: {
+                    description,
+                    id,
+                    status,
+                    title,
+                    index,
+                  },
+                  create: {
+                    description,
+                    title,
+                    id,
+                    status,
+                    subtasks: {
+                      createMany: {
+                        data: subtasks
+                          ? subtasks.map(
+                              ({ id, title, isCompleted }, index) => ({
+                                id,
+                                title,
+                                isCompleted,
+                                index,
+                              })
+                            )
+                          : [],
+                      },
+                    },
+                    index,
+                  },
+                })
+              ),
+            },
+          },
+          include: {
+            tasks: {
+              include: {
+                subtasks: true,
+              },
+            },
+          },
+        });
+      })
+    );
+
+    return c.json(updatedColumns, 200);
+  } catch (error) {
+    console.error("Error updating columns: ", error);
+    return c.json({ error: "server error" }, 500);
+  }
+};
+
 export const updateColumn = async (c: Context<HonoContext>) => {
   try {
     const columnId = c.req.param("id");
@@ -120,7 +212,57 @@ export const updateColumn = async (c: Context<HonoContext>) => {
 
     const updatedColumn = await prisma.column.update({
       where: { id: columnId },
-      data: validation.data,
+      data: {
+        ...validation.data,
+        tasks: {
+          deleteMany: {
+            id: {
+              notIn: validation.data.tasks?.map((t) => t.id),
+            },
+          },
+          upsert: validation.data.tasks?.map(
+            ({ description, id, status, title, subtasks }, index) => ({
+              where: {
+                id,
+              },
+              update: {
+                description,
+                id,
+                status,
+
+                title,
+                index,
+              },
+              create: {
+                description,
+                title,
+                id,
+                status,
+                subtasks: {
+                  createMany: {
+                    data: subtasks
+                      ? subtasks.map(({ id, title, isCompleted }, index) => ({
+                          id,
+                          title,
+                          isCompleted,
+                          index,
+                        }))
+                      : [],
+                  },
+                },
+                index,
+              },
+            })
+          ),
+        },
+      },
+      include: {
+        tasks: {
+          include: {
+            subtasks: true,
+          },
+        },
+      },
     });
 
     return c.json(updatedColumn, 201);

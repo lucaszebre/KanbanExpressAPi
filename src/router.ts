@@ -12,6 +12,7 @@ import {
   deleteColumn,
   getColumn,
   updateColumn,
+  updateColumns,
 } from "./handlers/column.js";
 import {
   createSubTask,
@@ -41,6 +42,7 @@ router.patch("/boards/:id", updateBoard);
 router.delete("/boards/:boardId", deleteBoard);
 
 router.post("/boards/:boardId/columns", createColumns);
+router.patch("/boards/:boardId/columns", updateColumns);
 router.get("/columns/:id", getColumn);
 router.patch("/columns/:id", updateColumn);
 router.delete("/columns/:id", deleteColumn);

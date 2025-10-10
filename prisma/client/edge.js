@@ -156,7 +156,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "/home/lucas/personalProject/KanbanBackend/hono-app/prisma/client",
+      "value": "/home/lucas/personalProject/KanbanBackend/prisma/client",
       "fromEnvVar": null
     },
     "config": {
@@ -172,7 +172,7 @@ const config = {
     "previewFeatures": [
       "driverAdapters"
     ],
-    "sourceFilePath": "/home/lucas/personalProject/KanbanBackend/hono-app/prisma/schema.prisma",
+    "sourceFilePath": "/home/lucas/personalProject/KanbanBackend/prisma/schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -186,6 +186,7 @@ const config = {
     "db"
   ],
   "activeProvider": "sqlite",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
