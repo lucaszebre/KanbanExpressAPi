@@ -8,7 +8,7 @@ export const generateAccessToken = async (
   return await sign(
     {
       ...payload,
-      exp: Math.floor(Date.now() / 1000) + 60 * 15, // 15 minutes
+      exp: Math.floor(Date.now() / 1000) + 60 * 60 * 3, // 3 hours
     },
     secret
   );

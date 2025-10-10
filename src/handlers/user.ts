@@ -99,7 +99,7 @@ export const register = async (c: Context<HonoContext>) => {
       httpOnly: true,
       secure: true,
       sameSite: "None",
-      maxAge: 60 * 60,
+      maxAge: 60 * 60 * 3,
     });
 
     return c.json({ user, message: "Registration successful" });
@@ -165,7 +165,7 @@ export const login = async (c: Context<HonoContext>) => {
       httpOnly: true,
       secure: true,
       sameSite: "None",
-      maxAge: 60 * 60,
+      maxAge: 60 * 60 * 3,
     });
 
     return c.json({ user, message: "Login successful" });
@@ -221,7 +221,7 @@ export const refreshToken = async (c: Context<HonoContext>) => {
       httpOnly: true,
       secure: true,
       sameSite: "None",
-      maxAge: 60 * 60,
+      maxAge: 60 * 60 * 3,
     });
 
     return c.json({ message: "Token refreshed successfully" });
