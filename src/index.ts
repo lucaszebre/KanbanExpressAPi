@@ -40,7 +40,7 @@ app.use(
 app.use("*", logger());
 
 app.get("/", (c) => {
-  return c.text("Hello Hono!");
+  return c.text("welcome to the kanban app's backend");
 });
 
 app.post("/register", register);
